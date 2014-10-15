@@ -37,6 +37,7 @@ import com.android.systemui.statusbar.policy.NetworkController;
 import com.android.systemui.statusbar.policy.RotationLockController;
 import com.android.systemui.statusbar.policy.HotspotController;
 import com.android.systemui.statusbar.policy.ZenModeController;
+import com.android.systemui.volume.VolumeComponent;
 
 import java.util.Collection;
 import java.util.Objects;
@@ -110,6 +111,10 @@ public abstract class QSTile<TState extends State> implements Listenable {
         mHandler.sendEmptyMessage(H.SECONDARY_CLICK);
     }
 
+    public void longClick() {
+        mHandler.sendEmptyMessage(H.LONG_CLICK);
+    }
+
     public void showDetail(boolean show) {
         mHandler.obtainMessage(H.SHOW_DETAIL, show ? 1 : 0, 0).sendToTarget();
     }
@@ -150,6 +155,10 @@ public abstract class QSTile<TState extends State> implements Listenable {
     }
 
     protected void handleSecondaryClick() {
+        // optional
+    }
+
+    protected void handleLongClick() {
         // optional
     }
 
@@ -220,6 +229,7 @@ public abstract class QSTile<TState extends State> implements Listenable {
         private static final int TOGGLE_STATE_CHANGED = 7;
         private static final int SCAN_STATE_CHANGED = 8;
         private static final int DESTROY = 9;
+        private static final int LONG_CLICK = 10;
 
         private H(Looper looper) {
             super(looper);
@@ -257,6 +267,9 @@ public abstract class QSTile<TState extends State> implements Listenable {
                 } else if (msg.what == DESTROY) {
                     name = "handleDestroy";
                     handleDestroy();
+                } else if (msg.what == LONG_CLICK) {
+                    name = "handleLongClick";
+                    handleLongClick();
                 } else {
                     throw new IllegalArgumentException("Unknown msg: " + msg.what);
                 }
@@ -291,6 +304,7 @@ public abstract class QSTile<TState extends State> implements Listenable {
         ZenModeController getZenModeController();
         HotspotController getHotspotController();
         CastController getCastController();
+        VolumeComponent getVolumeComponent();
         FlashlightController getFlashlightController();
         KeyguardMonitor getKeyguardMonitor();
 

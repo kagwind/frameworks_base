@@ -48,8 +48,13 @@ interface ITelephony {
     void call(String callingPackage, String number);
 
     /**
+     * Toggle between 3G and LTE (NT_MODE_CDMA, NT_MODE_GLOBAL)
+     * @param boolean to turn on and off LTE
+     */
+    void toggleLTE(boolean on);
+
+    /**
      * End call if there is a call in progress, otherwise does nothing.
-     *
      * @return whether it hung up
      */
     boolean endCall();
@@ -488,6 +493,12 @@ interface ITelephony {
      */
     void setCellInfoListRate(int rateInMillis);
 
+
+    /**
+     * Return if the current radio is LTE on GSM
+     */
+    int getLteOnGsmMode();
+
     /**
      * get default sim
      * @return sim id
@@ -648,6 +659,13 @@ interface ITelephony {
      * @param enable true to turn on, else false
      */
     void setDataEnabled(boolean enable);
+
+    /**
+     * User enable/disable Mobile Data per subscription.
+     *
+     * @param enable true to turn on, else false
+     */
+    void setDataEnabledUsingSubId(long subId, boolean enable);
 
     /**
      * Get the user enabled state of Mobile Data.

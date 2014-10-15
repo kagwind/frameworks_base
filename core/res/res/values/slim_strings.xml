@@ -132,4 +132,11 @@
     <string name="permlab_changeHeadsUpState">enable or disable heads up</string>
     <string name="permdesc_changeHeadsUpState">Allows the application to change whether another application is allowed to show normal notifications as heads up notification.</string>
 
+    <!-- ADB over network notification -->
+    <string name="adb_net_active_notification_title">ADB over network enabled</string>
+    <!-- ADB over USB and network notification -->
+    <string name="adb_both_active_notification_title">ADB over USB &amp; network enabled</string>
+    <!-- ADB notification message-->
+    <string name="adb_active_generic_notification_message">Touch to disable debugging.</string>
+
 </resources>
