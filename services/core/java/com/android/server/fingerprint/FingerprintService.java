@@ -51,7 +51,7 @@ import java.util.Iterator;
  */
 public class FingerprintService extends SystemService {
     private final String TAG = "FingerprintService";
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
     private ArrayMap<IBinder, ClientData> mClients = new ArrayMap<IBinder, ClientData>();
 
     private static final int MSG_NOTIFY = 10;
