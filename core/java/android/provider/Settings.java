@@ -3574,6 +3574,13 @@ public final class Settings {
         public static final String STATUS_BAR_SHOW_NETWORK_ACTIVITY = "status_bar_show_network_activity";
 
         /**
+         * Defines the status and navigation bar color is battery safe mode is enabled.
+         *
+         * @hide
+         */
+        public static final String BATTERY_SAVER_MODE_COLOR = "battery_save_mode_color";
+
+        /**
          * Settings to backup. This is here so that it's in the same place as the settings
          * keys and easy to update.
          *
