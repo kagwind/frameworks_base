@@ -72,6 +72,7 @@
     <string name="quick_settings_screen_timeout_detail_title">Screen timeout</string>
     <string name="quick_settings_reboot_label">Reboot</string>
     <string name="quick_settings_reboot_recovery_label">Recovery</string>
+    <string name="quick_settings_usb_tether">USB tethering</string>
 
     <!-- Slim Shortcut Actions -->
     <string name="shortcut_picker">Slim Shortcuts</string>
