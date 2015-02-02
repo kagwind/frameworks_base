@@ -2174,6 +2174,12 @@ public final class Settings {
         public static final String DOZE_SCHEDULE = "doze_schedule";
 
         /**
+         * Doze pulse screen brightness level
+         * @hide
+         */
+        public static final String DOZE_BRIGHTNESS = "doze_brightness";
+
+        /**
          * Defines the status and navigation bar color is battery safe mode is enabled.
          *
          * @hide
