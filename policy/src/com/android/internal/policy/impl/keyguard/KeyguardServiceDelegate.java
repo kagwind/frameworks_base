@@ -149,10 +149,10 @@ public class KeyguardServiceDelegate {
                 mKeyguardService.onScreenTurnedOn(new KeyguardShowDelegate(
                         mShowListenerWhenConnect));
                 mShowListenerWhenConnect = null;
-                sendStateChangeBroadcast(true);
             }
             if (mKeyguardState.bootCompleted) {
                 mKeyguardService.onBootCompleted();
+                sendStateChangeBroadcast(true);
             }
         }
 
@@ -277,7 +277,6 @@ public class KeyguardServiceDelegate {
         } else {
             mKeyguardState.systemIsReady = true;
         }
-        sendStateChangeBroadcast(true);
     }
 
     public void doKeyguardTimeout(Bundle options) {
@@ -353,6 +352,7 @@ public class KeyguardServiceDelegate {
             sendStateChangeBroadcast(true);
         }
         mKeyguardState.bootCompleted = true;
+        sendStateChangeBroadcast(true);
     }
 
     public void onActivityDrawn() {
