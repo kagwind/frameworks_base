@@ -104,4 +104,14 @@
         <item>@string/app_ops_toggle_mobile_data</item>
     </string-array>
 
+    <!-- Doze pulse screen tint. Default is identity (no tint), but can use RRO -->
+    <!-- or similar to apply custom tint. For details on how color is computed -->
+    <!-- from this color matrix, see android reference on ColorMatrix. -->
+    <string-array translatable="false" name="doze_tint">
+        <item>1.0</item> <item>0.0</item> <item>0.0</item> <item>0.0</item> <item>0.0</item>
+        <item>0.0</item> <item>1.0</item> <item>0.0</item> <item>0.0</item> <item>0.0</item>
+        <item>0.0</item> <item>0.0</item> <item>1.0</item> <item>0.0</item> <item>0.0</item>
+        <item>0.0</item> <item>0.0</item> <item>0.0</item> <item>1.0</item> <item>0.0</item>
+    </string-array>
+
 </resources>

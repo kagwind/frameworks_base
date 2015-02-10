@@ -21,6 +21,8 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
@@ -359,10 +361,36 @@ public abstract class ActivatableNotificationView extends ExpandableOutlineView 
              0f,  0f, -1f, 1f, 1f,
              0f,  0f,  0f, 1f, 0f
         };
-        final ColorMatrix m = new ColorMatrix(invert);
-        final ColorMatrix grayscale = new ColorMatrix();
-        grayscale.setSaturation(0);
-        m.preConcat(grayscale);
+
+        ColorMatrix m;
+        // only set ColorMatrix m to invert if configured to do so
+        if (Resources.getSystem().getBoolean(
+                com.android.internal.R.bool.config_invert_colors_on_doze)) {
+            m = new ColorMatrix(invert);
+        } else {
+            m = new ColorMatrix();
+        }
+
+        // only apply grayscale matrix if configured to do so
+        if (Resources.getSystem().getBoolean(
+                com.android.internal.R.bool.config_apply_grayscale_on_doze)) {
+            final ColorMatrix grayscale = new ColorMatrix();
+            grayscale.setSaturation(0);
+            m.preConcat(grayscale);
+        }
+
+        // custom tint array gets applied here (if no overlay present, default array
+        // is equal to identity - it will do nothing)
+        final TypedArray rawTint = Resources.getSystem().obtainTypedArray(
+                com.android.internal.R.array.doze_tint);
+        int len = rawTint.length();
+        float[] resolvedTint = new float[len];
+        for (int i = 0; i < len; i++)
+            resolvedTint[i] = rawTint.getFloat(i, 0);
+        rawTint.recycle();
+        final ColorMatrix tint = new ColorMatrix(resolvedTint);
+        m.preConcat(tint);
+
         p.setColorFilter(new ColorMatrixColorFilter(m));
         return p;
     }
