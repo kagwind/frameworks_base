@@ -230,7 +230,6 @@ public final class CreateInfo implements ICreateInfo {
         "android.os.SystemProperties",
         "android.text.AndroidBidi",
         "android.text.StaticLayout",
-        "android.util.FloatMath",
         "android.view.Display",
         "libcore.icu.DateIntervalFormat",
         "libcore.icu.ICU",
