@@ -142,9 +142,6 @@
     <!-- milliseconds before the heads up notification accepts touches. -->
     <integer name="heads_up_sensitivity_delay">700</integer>
 
-    <!-- milliseconds how long heads up should be in snooze. -->
-    <integer name="heads_up_snooze_time">300000</integer>
-
     <!-- The duration in seconds to wait before the dismiss buttons are shown. -->
     <integer name="recents_task_bar_dismiss_delay_seconds">1</integer>
     <!-- The min animation duration for animating views that are currently visible. -->

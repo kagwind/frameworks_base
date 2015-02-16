@@ -2144,20 +2144,6 @@ public final class Settings {
                 "lockscreen_shortcuts_longpress";
 
         /**
-         * Defines global heads up snooze time if user want to snooze it.
-         *
-         * @hide
-         */
-        public static final String HEADS_UP_SNOOZE_TIME = "heads_up_snooze_time";
-
-        /**
-         * Defines the global heads up notification decay
-         *
-         * @hide
-         */
-        public static final String HEADS_UP_NOTIFCATION_DECAY = "heads_up_notification_decay";
-
-        /**
          * Timeout for ambient display notification
          * @hide
          */
@@ -2936,6 +2922,18 @@ public final class Settings {
         public static final String SIP_CALL_OPTIONS = "sip_call_options";
 
         /**
+         * Hide notification instead of remove when swiping headsup
+         * @hide
+         */
+        public static final String HEADS_UP_DISMISS_ON_REMOVE = "heads_up_dismiss_on_remove";
+
+        /**
+         * Hide notification 1 second after touching outside
+         * @hide
+         */
+        public static final String HEADS_UP_TOUCH_OUTSIDE = "heads_up_touch_outside";
+
+        /**
          * One of the sip call options: Always use SIP with network access.
          * @hide
          */
@@ -3353,6 +3351,34 @@ public final class Settings {
          * @hide
          */
         public static final String DOUBLE_TAP_SLEEP_GESTURE = "double_tap_sleep_gesture";
+
+        /**
+         * Heads Up Notifications
+         *
+         * @hide
+         */
+        public static final String HEADS_UP_NOTIFICATION = "heads_up_enabled";
+
+        /**
+         * Which applications to disable heads up notifications for
+         *
+         * @hide
+         */
+        public static final String HEADS_UP_CUSTOM_VALUES = "heads_up_custom_values";
+
+        /**
+         * Which applications to disable heads up notifications for
+         *
+         * @hide
+         */
+        public static final String HEADS_UP_BLACKLIST_VALUES = "heads_up_blacklist_values";
+
+        /**
+         * Defines the global heads up notification decay
+         *
+         * @hide
+         */
+        public static final String HEADS_UP_NOTIFCATION_DECAY = "heads_up_notification_decay";
 
         /**
          * Settings to backup. This is here so that it's in the same place as the settings

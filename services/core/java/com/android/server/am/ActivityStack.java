@@ -1115,7 +1115,6 @@ final class ActivityStack {
             mActivityContainer.mActivityDisplay.setVisibleBehindActivity(null);
         }
 
-        updateHeadsUpState(next);
         updatePrivacyGuardNotificationLocked(next);
     }
 
@@ -1999,6 +1998,7 @@ final class ActivityStack {
             1, UserHandle.USER_CURRENT) == 0) {
             return;
         }
+
         String privacyGuardPackageName = mStackSupervisor.mPrivacyGuardPackageName;
         if (privacyGuardPackageName != null && privacyGuardPackageName.equals(next.packageName)) {
             return;
@@ -2017,27 +2017,6 @@ final class ActivityStack {
                     ActivityManagerService.POST_PRIVACY_NOTIFICATION_MSG, privacy, 0, next);
             msg.sendToTarget();
             mStackSupervisor.mPrivacyGuardPackageName = next.packageName;
-        }
-    }
-
-    private final void updateHeadsUpState(ActivityRecord next) {
-        String headsUpPackageName = mStackSupervisor.mHeadsUpPackageName;
-        if (headsUpPackageName != null && headsUpPackageName.equals(next.packageName)) {
-            return;
-        }
-
-        if (!mStackSupervisor
-                .getHeadsUpNotificationsEnabledForPackage(next.packageName, next.userId)) {
-            // Next package has no heads up enabled. So we do not need to notify
-            // statusbar service that the package has changed. Why bother with it?
-            mStackSupervisor.mHeadsUpPackageName = null;
-            return;
-        } else {
-            // Next package has heads up enabled. Notify statusbar service,
-            // let it decide if the heads up which is currently shown is
-            // from this package and hide it if this is the case.
-            mStackSupervisor.hideHeadsUpCandidate(next.packageName);
-            mStackSupervisor.mHeadsUpPackageName = next.packageName;
         }
     }
 
