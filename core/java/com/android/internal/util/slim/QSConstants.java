@@ -41,6 +41,7 @@ public class QSConstants {
     public static final String TILE_VISUALIZER = "visualizer";
     public static final String TILE_REBOOT = "reboot";
     public static final String TILE_USB_TETHER = "usb_tether";
+    public static final String TILE_SCREENSHOT = "screenshot";
     public static final String TILE_SLIMACTION = "slimaction";
 
     // Order matters
@@ -73,6 +74,7 @@ public class QSConstants {
         TILES_AVAILABLE.add(TILE_VISUALIZER);
         TILES_AVAILABLE.add(TILE_REBOOT);
         TILES_AVAILABLE.add(TILE_USB_TETHER);
+        TILES_AVAILABLE.add(TILE_SCREENSHOT);
         TILES_AVAILABLE.add(TILE_SLIMACTION);
     }
 }
