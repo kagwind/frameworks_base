@@ -47,6 +47,8 @@ public class StatusBarManager {
     public static final int DISABLE_BACK = View.STATUS_BAR_DISABLE_BACK;
     public static final int DISABLE_CLOCK = View.STATUS_BAR_DISABLE_CLOCK;
     public static final int DISABLE_SEARCH = View.STATUS_BAR_DISABLE_SEARCH;
+    public static final int DISABLE_MENU_BIG = View.STATUS_BAR_DISABLE_MENU_BIG;
+    public static final int DISABLE_ALWAYS_MENU = View.STATUS_BAR_DISABLE_ALWAYS_MENU;
 
     @Deprecated
     public static final int DISABLE_NAVIGATION = 
@@ -57,7 +59,7 @@ public class StatusBarManager {
     public static final int DISABLE_MASK = DISABLE_EXPAND | DISABLE_NOTIFICATION_ICONS
             | DISABLE_NOTIFICATION_ALERTS | DISABLE_NOTIFICATION_TICKER
             | DISABLE_SYSTEM_INFO | DISABLE_RECENT | DISABLE_HOME | DISABLE_BACK | DISABLE_CLOCK
-            | DISABLE_SEARCH;
+            | DISABLE_SEARCH | DISABLE_MENU_BIG | DISABLE_ALWAYS_MENU;
 
     public static final int NAVIGATION_HINT_BACK_ALT      = 1 << 0;
     public static final int NAVIGATION_HINT_IME_SHOWN     = 1 << 1;

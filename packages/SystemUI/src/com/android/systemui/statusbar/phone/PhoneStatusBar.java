@@ -45,6 +45,8 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.ContentObserver;
@@ -1377,14 +1379,8 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
     private void prepareNavigationBarView() {
         mNavigationBarView.reorient();
-
-        mNavigationBarView.getRecentsButton().setOnClickListener(mRecentsClickListener);
-        mNavigationBarView.getRecentsButton().setOnTouchListener(mRecentsPreloadOnTouchListener);
-        mNavigationBarView.getRecentsButton().setLongClickable(true);
-        mNavigationBarView.getRecentsButton().setOnLongClickListener(mLongPressBackRecentsListener);
-        mNavigationBarView.getBackButton().setLongClickable(true);
-        mNavigationBarView.getBackButton().setOnLongClickListener(mLongPressBackRecentsListener);
-        mNavigationBarView.getHomeButton().setOnTouchListener(mHomeActionListener);
+        mNavigationBarView.setListeners(mRecentsClickListener, mRecentsPreloadOnTouchListener,
+                mLongPressBackRecentsListener, mHomeActionListener);
         updateSearchPanel();
     }
 
@@ -2251,6 +2247,10 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         flagdbg.append(((diff  & StatusBarManager.DISABLE_CLOCK) != 0) ? "* " : " ");
         flagdbg.append(((state & StatusBarManager.DISABLE_SEARCH) != 0) ? "SEARCH" : "search");
         flagdbg.append(((diff  & StatusBarManager.DISABLE_SEARCH) != 0) ? "* " : " ");
+        flagdbg.append(((state & StatusBarManager.DISABLE_MENU_BIG) != 0) ? "MENUBIG" : "menubig");
+        flagdbg.append(((diff  & StatusBarManager.DISABLE_MENU_BIG) != 0) ? "* " : " ");
+        flagdbg.append(((state & StatusBarManager.DISABLE_ALWAYS_MENU) != 0) ? "ALWAYSMENU" : "alwaysmenu");
+        flagdbg.append(((diff  & StatusBarManager.DISABLE_ALWAYS_MENU) != 0) ? "* " : " ");
         flagdbg.append(">");
         Log.d(TAG, flagdbg.toString());
 
@@ -2284,7 +2284,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         if ((diff & (StatusBarManager.DISABLE_HOME
                         | StatusBarManager.DISABLE_RECENT
                         | StatusBarManager.DISABLE_BACK
-                        | StatusBarManager.DISABLE_SEARCH)) != 0) {
+                        | StatusBarManager.DISABLE_SEARCH
+                        | StatusBarManager.DISABLE_MENU_BIG
+                        | StatusBarManager.DISABLE_ALWAYS_MENU)) != 0) {
             // the nav bar will take care of these
             if (mNavigationBarView != null) mNavigationBarView.setDisabledFlags(state);
 
@@ -3570,6 +3572,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         updateNotifications();
         resetUserSetupObserver();
         setControllerUsers();
+        if (mNavigationBarView != null) {
+            mNavigationBarView.updateSettings();
+        }
     }
 
     private void setControllerUsers() {
@@ -3781,7 +3786,10 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     protected boolean shouldDisableNavbarGestures() {
         return !isDeviceProvisioned()
                 || mExpandedVisible
-                || (mDisabled & StatusBarManager.DISABLE_SEARCH) != 0;
+                || (mNavigationBarView != null && mNavigationBarView.isInEditMode())
+                || (mDisabled & StatusBarManager.DISABLE_SEARCH
+                        & StatusBarManager.DISABLE_MENU_BIG
+                        & StatusBarManager.DISABLE_ALWAYS_MENU) != 0;
     }
 
     public void postStartSettingsActivity(final Intent intent, int delay) {
@@ -4381,6 +4389,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     private void handleLongPressBackRecents(View v) {
         try {
             boolean sendBackLongPress = false;
+            boolean hijackRecentsLongPress = false;
             IActivityManager activityManager = ActivityManagerNative.getDefault();
             boolean isAccessiblityEnabled = mAccessibilityManager.isEnabled();
             if (activityManager.isInLockTaskMode() && !isAccessiblityEnabled) {
@@ -4389,17 +4398,21 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                 // long-pressed 'together'
                 if ((time - mLastLockToAppLongPress) < LOCK_TO_APP_GESTURE_TOLERENCE) {
                     activityManager.stopLockTaskModeOnCurrent();
-                } else if ((v.getId() == R.id.back)
+                } else if ((NavbarEditor.NAVBAR_BACK.equals(v.getTag()))
                         && !mNavigationBarView.getRecentsButton().isPressed()) {
                     // If we aren't pressing recents right now then they presses
                     // won't be together, so send the standard long-press action.
                     sendBackLongPress = true;
+                } else if (NavbarEditor.NAVBAR_RECENT.equals(v.getTag()) && !activityManager.isInLockTaskMode()) {
+                    hijackRecentsLongPress = true;
                 }
                 mLastLockToAppLongPress = time;
             } else {
                 // If this is back still need to handle sending the long-press event.
-                if (v.getId() == R.id.back) {
+                if (NavbarEditor.NAVBAR_BACK.equals(v.getTag())) {
                     sendBackLongPress = true;
+                } else if (NavbarEditor.NAVBAR_RECENT.equals(v.getTag()) && !activityManager.isInLockTaskMode()) {
+                    hijackRecentsLongPress = true;
                 } else if (isAccessiblityEnabled && activityManager.isInLockTaskMode()) {
                     // When in accessibility mode a long press that is recents (not back)
                     // should stop lock task.
@@ -4411,9 +4424,42 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                 keyButtonView.sendEvent(KeyEvent.ACTION_DOWN, KeyEvent.FLAG_LONG_PRESS);
                 keyButtonView.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_LONG_CLICKED);
             }
+            if (hijackRecentsLongPress) {
+                final ActivityManager am =
+                        (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
+                ActivityManager.RunningTaskInfo lastTask = getLastTask(am);
+
+                if (lastTask != null) {
+                    if (DEBUG) Log.d(TAG, "switching to " + lastTask.topActivity.getPackageName());
+                    am.moveTaskToFront(lastTask.id, ActivityManager.MOVE_TASK_NO_USER_ACTION);
+                }
+            }
         } catch (RemoteException e) {
             Log.d(TAG, "Unable to reach activity manager", e);
         }
+    }
+
+    private ActivityManager.RunningTaskInfo getLastTask(final ActivityManager am) {
+        final String defaultHomePackage = resolveCurrentLauncherPackage();
+        List<ActivityManager.RunningTaskInfo> tasks = am.getRunningTasks(5);
+
+        for (int i = 1; i < tasks.size(); i++) {
+            String packageName = tasks.get(i).topActivity.getPackageName();
+            if (!packageName.equals(defaultHomePackage)
+                    && !packageName.equals(mContext.getPackageName())) {
+                return tasks.get(i);
+            }
+        }
+
+        return null;
+    }
+
+    private String resolveCurrentLauncherPackage() {
+        final Intent launcherIntent = new Intent(Intent.ACTION_MAIN)
+                .addCategory(Intent.CATEGORY_HOME);
+        final PackageManager pm = mContext.getPackageManager();
+        final ResolveInfo launcherInfo = pm.resolveActivity(launcherIntent, 0);
+        return launcherInfo.activityInfo.packageName;
     }
 
     // Recents

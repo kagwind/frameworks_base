@@ -1264,6 +1264,9 @@ public final class Settings {
             /* CM12 CHANGES */
             MOVED_TO_SECURE.add(Secure.QS_TILES);
             MOVED_TO_SECURE.add(Secure.QS_USE_MAIN_TILES);
+            for (String s : Secure.NAVIGATION_RING_TARGETS) {
+                MOVED_TO_SECURE.add(s);
+            }
         }
 
         private static final HashSet<String> MOVED_TO_GLOBAL;
@@ -1834,6 +1837,12 @@ public final class Settings {
          * @hide
          */
         public static final int ADVANCED_SETTINGS_DEFAULT = 0;
+
+        /**
+         * Navigation controls to Use
+         * @hide
+         */
+        public static final String NAV_BUTTONS = "nav_buttons";
 
         /**
          * @deprecated Use {@link android.provider.Settings.Global#AIRPLANE_MODE_ON} instead
@@ -3198,12 +3207,12 @@ public final class Settings {
         public static final String VOLUME_KEYS_CONTROL_MEDIA_STREAM = "volume_keys_control_media_stream";
 
         /**
-          * Volume keys control cursor in text fields (default is 0)
-          * 0 - Disabled
-          * 1 - Volume up/down moves cursor left/right
-          * 2 - Volume up/down moves cursor right/left
-          * @hide
-          */
+         * Volume keys control cursor in text fields (default is 0)
+         * 0 - Disabled
+         * 1 - Volume up/down moves cursor left/right
+         * 2 - Volume up/down moves cursor right/left
+         * @hide
+         */
         public static final String VOLUME_KEY_CURSOR_CONTROL = "volume_key_cursor_control";
 
         /**
@@ -3745,6 +3754,21 @@ public final class Settings {
         @Deprecated
         public static final String WIFI_WATCHDOG_PING_TIMEOUT_MS =
             Secure.WIFI_WATCHDOG_PING_TIMEOUT_MS;
+
+        /**
+         * boolean value. toggles using arrow key locations on nav bar
+         * as left and right dpad keys
+         * @hide
+         */
+        public static final String NAVIGATION_BAR_MENU_ARROW_KEYS = "navigation_bar_menu_arrow_keys";
+
+        /**
+         * boolean value. toggles automatically reaaranging (autopadding)
+         * navbar buttons
+         * @hide
+         */
+        public static final String NAVIGATION_BAR_AUTOPADDING = "navigation_bar_autopadding";
+
     }
 
     /**
@@ -5757,6 +5781,23 @@ public final class Settings {
          */
         public static final String VOLUME_LINK_NOTIFICATION = "volume_link_notification";
 
+        /**
+         * Custom navring actions
+         * @hide
+         */
+        public static final String[] NAVIGATION_RING_TARGETS = new String[] {
+                "navigation_ring_targets_0",
+                "navigation_ring_targets_1",
+                "navigation_ring_targets_2",
+        };
+
+        /**
+         * Whether search panel is enabled.
+         * @hide
+         */
+        public static final String SEARCH_PANEL_ENABLED = "search_panel_enabled";
+
+        /**
          * This are the settings to be backed up.
          *
          * NOTE: Settings are backed up and restored in the order they appear

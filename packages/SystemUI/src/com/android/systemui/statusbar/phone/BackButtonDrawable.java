@@ -54,9 +54,10 @@ public class BackButtonDrawable extends Drawable {
         final int boundsCenterX = bounds.width() / 2;
         final int boundsCenterY = bounds.height() / 2;
 
-        canvas.translate(boundsCenterX, boundsCenterY);
-        canvas.rotate(mRotation);
-        canvas.translate(- boundsCenterX, - boundsCenterY);
+//        canvas.translate(boundsCenterX, boundsCenterY);
+//        canvas.rotate(mRotation);
+//        canvas.translate(- boundsCenterX, - boundsCenterY);
+        canvas.rotate(mRotation, boundsCenterX, boundsCenterY);
 
         mWrappedDrawable.draw(canvas);
     }
