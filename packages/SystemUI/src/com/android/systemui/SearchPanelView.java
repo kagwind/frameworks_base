@@ -58,7 +58,7 @@ import com.android.systemui.statusbar.phone.PhoneStatusBar;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.android.internal.util.slim.NavigationRingConstants.*;
+import static com.android.internal.util.slim.ActionConstants.*;
 
 public class SearchPanelView extends FrameLayout implements StatusBarPanel,
         View.OnClickListener, ShortcutPickHelper.OnPickListener {
@@ -475,7 +475,7 @@ public class SearchPanelView extends FrameLayout implements StatusBarPanel,
             View parent = (View) v.getParent();
             String action = mTargetActivities[i];
             boolean visible = mInEditMode
-                    || (!TextUtils.isEmpty(action) && !ACTION_NONE.equals(action));
+                    || (!TextUtils.isEmpty(action) && !ACTION_NULL.equals(action));
             parent.setVisibility(visible ? View.VISIBLE : View.GONE);
         }
     }

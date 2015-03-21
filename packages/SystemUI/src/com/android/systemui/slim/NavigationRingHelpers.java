@@ -32,7 +32,7 @@ import com.android.systemui.R;
 
 import java.net.URISyntaxException;
 
-import static com.android.internal.util.slim.NavigationRingConstants.*;
+import static com.android.internal.util.slim.ActionConstants.*;
 
 public class NavigationRingHelpers {
     public static final int MAX_ACTIONS = 3;
@@ -96,21 +96,21 @@ public class NavigationRingHelpers {
     public static Drawable getTargetDrawable(Context context, String action) {
         int resourceId = -1;
 
-        if (TextUtils.isEmpty(action) || action.equals(ACTION_NONE)) {
+        if (TextUtils.isEmpty(action) || action.equals(ACTION_NULL)) {
             resourceId = R.drawable.ic_navigation_ring_empty;
         } else if (action.equals(ACTION_SCREENSHOT)) {
             resourceId = R.drawable.ic_navigation_ring_screenshot;
-        } else if (action.equals(ACTION_IME_SWITCHER)) {
+        } else if (action.equals(ACTION_IME)) {
             resourceId = R.drawable.ic_navigation_ring_ime_switcher;
-        } else if (action.equals(ACTION_VIBRATE)) {
+        } else if (action.equals(ACTION_VIB)) {
             resourceId = getVibrateDrawableResId(context);
         } else if (action.equals(ACTION_SILENT)) {
             resourceId = getSilentDrawableResId(context);
-        } else if (action.equals(ACTION_RING_SILENT_VIBRATE)) {
+        } else if (action.equals(ACTION_VIB_SILENT)) {
             resourceId = getRingerDrawableResId(context);
-        } else if (action.equals(ACTION_KILL_TASK)) {
+        } else if (action.equals(ACTION_KILL)) {
             resourceId = R.drawable.ic_navigation_ring_killtask;
-        } else if (action.equals(ACTION_STANDBY)) {
+        } else if (action.equals(ACTION_POWER)) {
             resourceId = R.drawable.ic_navigation_ring_standby;
         } else if (action.equals(ACTION_TORCH)) {
             resourceId = getTorchDrawableResId(context);

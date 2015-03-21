@@ -48,7 +48,7 @@ import android.view.WindowManagerGlobal;
 import android.widget.Toast;
 
 import com.android.internal.statusbar.IStatusBarService;
-import static com.android.internal.util.slim.NavigationRingConstants.*;
+import static com.android.internal.util.slim.ActionConstants.*;
 import com.android.systemui.screenshot.TakeScreenshotService;
 
 import java.net.URISyntaxException;
@@ -80,7 +80,7 @@ public class ActionTarget {
     }
 
     public boolean launchAction(String action, Bundle opts) {
-        if (TextUtils.isEmpty(action) || action.equals(ACTION_NONE)) {
+        if (TextUtils.isEmpty(action) || action.equals(ACTION_NULL)) {
             return false;
         } else if (action.equals(ACTION_RECENTS)) {
             try {
@@ -103,7 +103,7 @@ public class ActionTarget {
         } else if (action.equals(ACTION_STANDBY)) {
             injectKeyDelayed(KeyEvent.KEYCODE_POWER);
             return true;
-        } else if (action.equals(ACTION_IME_SWITCHER)) {
+        } else if (action.equals(ACTION_IME)) {
             mContext.sendBroadcast(new Intent("android.settings.SHOW_INPUT_METHOD_PICKER"));
             return true;
         } else if (action.equals(ACTION_SCREENSHOT)) {
@@ -111,10 +111,10 @@ public class ActionTarget {
             return true;
         } else if (action.equals(ACTION_ASSIST)) {
             return false;
-        } else if (action.equals(ACTION_KILL_TASK)) {
+        } else if (action.equals(ACTION_KILL)) {
             mHandler.post(mKillRunnable);
             return true;
-        } else if (action.equals(ACTION_VIBRATE)) {
+        } else if (action.equals(ACTION_VIB)) {
             if (mAm.getRingerMode() != AudioManager.RINGER_MODE_VIBRATE) {
                 switchToVibrateMode();
             } else {
@@ -130,7 +130,7 @@ public class ActionTarget {
             }
 
             return true;
-        } else if (action.equals(ACTION_RING_SILENT_VIBRATE)) {
+        } else if (action.equals(ACTION_VIB_SILENT)) {
             int ringerMode = mAm.getRingerMode();
             if (ringerMode == AudioManager.RINGER_MODE_NORMAL) {
                 switchToVibrateMode();

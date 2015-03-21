@@ -45,7 +45,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import static com.android.internal.util.slim.NavigationRingConstants.*;
+import static com.android.internal.util.slim.ActionConstants.*;
 
 public class ShortcutPickHelper {
 
@@ -231,9 +231,9 @@ public class ShortcutPickHelper {
             mContext.registerReceiver(mReceiver, filter);
         }
         if (showNone) {
-            mActions.addAction(ACTION_NONE, R.string.navring_action_none, 0);
+            mActions.addAction(ACTION_NULL, R.string.navring_action_none, 0);
         } else {
-            mActions.removeAction(ACTION_NONE);
+            mActions.removeAction(ACTION_NULL);
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext)
                 .setTitle(mContext.getString(R.string.navbar_dialog_title))
@@ -276,18 +276,18 @@ public class ShortcutPickHelper {
         }
 
         mActions.addAction(ACTION_SCREENSHOT, R.string.navring_action_take_screenshot);
-        mActions.addAction(ACTION_IME_SWITCHER, R.string.navring_action_open_ime_switcher);
+        mActions.addAction(ACTION_IME, R.string.navring_action_open_ime_switcher);
         mActions.addAction(ACTION_SILENT, R.string.navring_action_ring_silent);
 
         Vibrator vibrator = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
         if (vibrator != null && vibrator.hasVibrator()) {
-            mActions.addAction(ACTION_VIBRATE, R.string.navring_action_ring_vibrate);
-            mActions.addAction(ACTION_RING_SILENT_VIBRATE,
+            mActions.addAction(ACTION_VIB, R.string.navring_action_ring_vibrate);
+            mActions.addAction(ACTION_VIB_SILENT,
                     R.string.navring_action_ring_vibrate_silent);
         }
 
-        mActions.addAction(ACTION_KILL_TASK, R.string.navring_action_kill_app);
-        mActions.addAction(ACTION_STANDBY, R.string.navring_action_screen_off);
+        mActions.addAction(ACTION_KILL, R.string.navring_action_kill_app);
+        mActions.addAction(ACTION_POWER, R.string.navring_action_screen_off);
     }
 
     private class ActionHolder {
