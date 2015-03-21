@@ -47,7 +47,7 @@ import android.view.animation.AnticipateOvershootInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import com.android.systemui.slimnavrings.ActionTarget;
+import com.android.internal.util.slim.Action;
 import com.android.systemui.slimnavrings.NavigationRingHelpers;
 import com.android.systemui.slimnavrings.ShortcutPickHelper;
 import com.android.systemui.statusbar.BaseStatusBar;
@@ -58,8 +58,8 @@ import com.android.systemui.statusbar.phone.PhoneStatusBar;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.android.systemui.slimnavrings.NavigationRingConstants.ACTION_ASSIST;
-import static com.android.systemui.slimnavrings.NavigationRingConstants.ACTION_NONE;
+import static com.android.internal.util.slim.ActionConstants.ACTION_ASSIST;
+import static com.android.internal.util.slim.ActionConstants.ACTION_NULL;
 import static com.android.systemui.slimnavrings.NavigationRingConstants.BROADCAST;
 
 public class SearchPanelView extends FrameLayout implements StatusBarPanel,
@@ -96,7 +96,6 @@ public class SearchPanelView extends FrameLayout implements StatusBarPanel,
     private ImageView mSelectedView;
     private List<ImageView> mTargetViews;
     private ImageView mLogoRight, mLogoLeft;
-    private final ActionTarget mActionTarget;
     private ShortcutPickHelper mPicker;
 
     public SearchPanelView(Context context, AttributeSet attrs) {
@@ -107,7 +106,6 @@ public class SearchPanelView extends FrameLayout implements StatusBarPanel,
         super(context, attrs, defStyle);
         mContext = context;
         mThreshold = context.getResources().getDimensionPixelSize(R.dimen.search_panel_threshold);
-        mActionTarget = new ActionTarget(context);
         mPicker = new ShortcutPickHelper(mContext, this);
         mTargetViews = new ArrayList<ImageView>();
         // Instantiate receiver/observer
@@ -378,9 +376,7 @@ public class SearchPanelView extends FrameLayout implements StatusBarPanel,
             return;
         }
         mLaunching = true;
-        if (!mActionTarget.launchAction(mTargetActivities[mCircle.mIntersectIndex])) {
-            startAssistActivity();
-        }
+        Action.processAction(mContext, mTargetActivities[mCircle.mIntersectIndex], false);
         vibrate();
         mCircle.setAnimatingOut(true);
         mCircle.startExitAnimation(new Runnable() {
@@ -476,7 +472,7 @@ public class SearchPanelView extends FrameLayout implements StatusBarPanel,
             View parent = (View) v.getParent();
             String action = mTargetActivities[i];
             boolean visible = mInEditMode
-                    || (!TextUtils.isEmpty(action) && !ACTION_NONE.equals(action));
+                    || (!TextUtils.isEmpty(action) && !ACTION_NULL.equals(action));
             parent.setVisibility(visible ? View.VISIBLE : View.GONE);
         }
     }
