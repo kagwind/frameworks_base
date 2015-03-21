@@ -16,18 +16,8 @@
 
 package com.android.internal.util.slim;
 
-import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
-import android.hardware.Sensor;
-import android.hardware.SensorManager;
-import android.hardware.camera2.CameraAccessException;
-import android.hardware.camera2.CameraCharacteristics;
-import android.hardware.camera2.CameraManager;
-import android.net.ConnectivityManager;
-import android.nfc.NfcAdapter;
-import android.telephony.TelephonyManager;
 import android.text.TextUtils;
-import com.android.internal.telephony.PhoneConstants;
 
 import java.util.Iterator;
 import java.util.List;
@@ -54,7 +44,7 @@ public class QSUtils {
 
     private static void filterTiles(Context context) {
         if (!sAvailableTilesFiltered) {
-            boolean deviceSupportsMobile = deviceSupportsMobileData(context);
+            boolean deviceSupportsMobile = DeviceUtils.deviceSupportsMobileData(context);
 
             // Tiles that need conditional filtering
             Iterator<String> iterator = QSConstants.TILES_AVAILABLE.iterator();
@@ -67,16 +57,16 @@ public class QSUtils {
                         removeTile = !deviceSupportsMobile;
                         break;
                     case QSConstants.TILE_FLASHLIGHT:
-                        removeTile = !deviceSupportsFlashLight(context);
+                        removeTile = !DeviceUtils.deviceSupportsTorch(context);
                         break;
                     case QSConstants.TILE_BLUETOOTH:
-                        removeTile = !deviceSupportsBluetooth();
+                        removeTile = !DeviceUtils.deviceSupportsBluetooth();
                         break;
                     case QSConstants.TILE_NFC:
-                        removeTile = !deviceSupportsNfc(context);
+                        removeTile = !DeviceUtils.deviceSupportsNfc(context);
                         break;
                     case QSConstants.TILE_COMPASS:
-                        removeTile = !deviceSupportsCompass(context);
+                        removeTile = !DeviceUtils.deviceSupportsCompass(context);
                         break;
                 }
                 if (removeTile) {
@@ -89,52 +79,4 @@ public class QSUtils {
         }
     }
 
-    public static boolean deviceSupportsLte(Context ctx) {
-        final TelephonyManager tm = (TelephonyManager)
-                ctx.getSystemService(Context.TELEPHONY_SERVICE);
-        return (tm.getLteOnCdmaMode() == PhoneConstants.LTE_ON_CDMA_TRUE)
-                || tm.getLteOnGsmMode() != 0;
-    }
-
-    public static boolean deviceSupportsMobileData(Context ctx) {
-        ConnectivityManager cm = (ConnectivityManager) ctx.getSystemService(
-                Context.CONNECTIVITY_SERVICE);
-        return cm.isNetworkSupported(ConnectivityManager.TYPE_MOBILE);
-    }
-
-    public static boolean deviceSupportsBluetooth() {
-        return BluetoothAdapter.getDefaultAdapter() != null;
-    }
-
-    public static boolean deviceSupportsNfc(Context context) {
-        return NfcAdapter.getDefaultAdapter(context) != null;
-    }
-
-    public static boolean deviceSupportsFlashLight(Context context) {
-        CameraManager cameraManager = (CameraManager) context.getSystemService(
-                Context.CAMERA_SERVICE);
-        try {
-            String[] ids = cameraManager.getCameraIdList();
-            for (String id : ids) {
-                CameraCharacteristics c = cameraManager.getCameraCharacteristics(id);
-                Boolean flashAvailable = c.get(CameraCharacteristics.FLASH_INFO_AVAILABLE);
-                Integer lensFacing = c.get(CameraCharacteristics.LENS_FACING);
-                if (flashAvailable != null
-                        && flashAvailable
-                        && lensFacing != null
-                        && lensFacing == CameraCharacteristics.LENS_FACING_BACK) {
-                    return true;
-                }
-            }
-        } catch (CameraAccessException e) {
-            // Ignore
-        }
-        return false;
-    }
-
-    public static boolean deviceSupportsCompass(Context context) {
-        SensorManager sm = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-        return sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null
-                && sm.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD) != null;
-    }
 }
