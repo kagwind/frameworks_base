@@ -132,6 +132,12 @@ public class Action {
                 } catch (RemoteException e) {
                 }
                 return;
+            } else if (action.equals(ActionConstants.ACTION_NOTIFICATIONS)) {
+                try {
+                    barService.expandNotificationsPanel();
+                } catch (RemoteException e) {
+                }
+                return;
             } else if (action.equals(ActionConstants.ACTION_SCREENSHOT)) {
                 try {
                     barService.toggleScreenshot();

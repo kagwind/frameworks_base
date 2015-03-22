@@ -47,7 +47,6 @@ import android.view.animation.AnticipateOvershootInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import com.android.systemui.slim.ActionTarget;
 import com.android.systemui.slim.NavigationRingHelpers;
 import com.android.systemui.slim.ShortcutPickHelper;
 import com.android.systemui.statusbar.BaseStatusBar;
@@ -59,6 +58,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.android.internal.util.slim.ActionConstants.*;
+import com.android.internal.util.slim.Action;
 
 public class SearchPanelView extends FrameLayout implements StatusBarPanel,
         View.OnClickListener, ShortcutPickHelper.OnPickListener {
@@ -94,7 +94,6 @@ public class SearchPanelView extends FrameLayout implements StatusBarPanel,
     private ImageView mSelectedView;
     private List<ImageView> mTargetViews;
     private ImageView mLogoRight, mLogoLeft;
-    private final ActionTarget mActionTarget;
     private ShortcutPickHelper mPicker;
 
     public SearchPanelView(Context context, AttributeSet attrs) {
@@ -105,7 +104,6 @@ public class SearchPanelView extends FrameLayout implements StatusBarPanel,
         super(context, attrs, defStyle);
         mContext = context;
         mThreshold = context.getResources().getDimensionPixelSize(R.dimen.search_panel_threshold);
-        mActionTarget = new ActionTarget(context);
         mPicker = new ShortcutPickHelper(mContext, this);
         mTargetViews = new ArrayList<ImageView>();
         // Instantiate receiver/observer
@@ -115,31 +113,31 @@ public class SearchPanelView extends FrameLayout implements StatusBarPanel,
         new SettingsObserver(new Handler());
     }
 
-    private void startAssistActivity() {
-        if (!mBar.isDeviceProvisioned()) return;
-
-        // Close Recent Apps if needed
-        mBar.animateCollapsePanels(CommandQueue.FLAG_EXCLUDE_SEARCH_PANEL);
-
-        final Intent intent = ((SearchManager) mContext.getSystemService(Context.SEARCH_SERVICE))
-                .getAssistIntent(mContext, true, UserHandle.USER_CURRENT);
-        if (intent == null) return;
-
-        try {
-            final ActivityOptions opts = ActivityOptions.makeCustomAnimation(mContext,
-                    R.anim.search_launch_enter, R.anim.search_launch_exit);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            AsyncTask.execute(new Runnable() {
-                @Override
-                public void run() {
-                    mContext.startActivityAsUser(intent, opts.toBundle(),
-                            new UserHandle(UserHandle.USER_CURRENT));
-                }
-            });
-        } catch (ActivityNotFoundException e) {
-            Log.w(TAG, "Activity not found for " + intent.getAction());
-        }
-    }
+//    private void startAssistActivity() {
+//        if (!mBar.isDeviceProvisioned()) return;
+//
+//       // Close Recent Apps if needed
+//        mBar.animateCollapsePanels(CommandQueue.FLAG_EXCLUDE_SEARCH_PANEL);
+//
+//        final Intent intent = ((SearchManager) mContext.getSystemService(Context.SEARCH_SERVICE))
+//                .getAssistIntent(mContext, true, UserHandle.USER_CURRENT);
+//        if (intent == null) return;
+//
+//        try {
+//            final ActivityOptions opts = ActivityOptions.makeCustomAnimation(mContext,
+//                    R.anim.search_launch_enter, R.anim.search_launch_exit);
+//            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//            AsyncTask.execute(new Runnable() {
+//                @Override
+//                public void run() {
+//                    mContext.startActivityAsUser(intent, opts.toBundle(),
+//                            new UserHandle(UserHandle.USER_CURRENT));
+//                }
+//            });
+//        } catch (ActivityNotFoundException e) {
+//            Log.w(TAG, "Activity not found for " + intent.getAction());
+//        }
+//    }
 
     @Override
     protected void onFinishInflate() {
@@ -376,9 +374,10 @@ public class SearchPanelView extends FrameLayout implements StatusBarPanel,
             return;
         }
         mLaunching = true;
-        if (!mActionTarget.launchAction(mTargetActivities[mCircle.mIntersectIndex])) {
-            startAssistActivity();
-        }
+        Action.processAction(mContext, mTargetActivities[mCircle.mIntersectIndex], false);
+//        if (!Action.processAction(mContext, mTargetActivities[mCircle.mIntersectIndex], false)) {
+//            startAssistActivity();
+//        }
         vibrate();
         mCircle.setAnimatingOut(true);
         mCircle.startExitAnimation(new Runnable() {
