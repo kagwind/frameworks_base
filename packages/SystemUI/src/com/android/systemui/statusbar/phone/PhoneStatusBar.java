@@ -2653,8 +2653,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         // Settings are not available in setup
         if (!mUserSetup) return;
 
-        mNotificationPanel.expand();
-        mNotificationPanel.openQs();
+        mNotificationPanel.expandWithQs();
 
         if (false) postStartTracing();
     }
@@ -3001,6 +3000,8 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             if (smartPulldownMode == 1 && !hasActiveClearableNotifications()) {
                 animateExpandSettingsPanel();
             } else if (smartPulldownMode == 2 && !hasActiveVisibleNotifications()) {
+                animateExpandSettingsPanel();
+            } else if (smartPulldownMode == 3 && !hasActiveVisibleNotifications() && !hasActiveClearableNotifications()) {
                 animateExpandSettingsPanel();
             } else if (smartPulldownMode == 0) {
                 Toast.makeText(mContext,

@@ -471,6 +471,13 @@ public class NotificationPanelView extends PanelView implements
         }
     }
 
+    public void expandWithQs() {
+        if (mQsExpansionEnabled) {
+            mTwoFingerQsExpand = true;
+        }
+        expand();
+    }
+
     @Override
     public void fling(float vel, boolean expand) {
         GestureRecorder gr = ((PhoneStatusBarView) mBar).mBar.getGestureRecorder();
