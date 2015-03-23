@@ -11656,4 +11656,11 @@ public class WindowManagerService extends IWindowManager.Stub
             }
         }
     }
+
+    /* @hide */
+    @Override
+    public void toggleGlobalMenu() {
+        mPolicy.toggleGlobalMenu();
+    }
+
 }

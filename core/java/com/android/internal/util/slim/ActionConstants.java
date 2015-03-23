@@ -28,6 +28,7 @@ public class ActionConstants {
     public static final String ACTION_MENU_BIG             = "**menu_big**";
     public static final String ACTION_POWER                = "**power**";
     public static final String ACTION_NOTIFICATIONS        = "**notifications**";
+    public static final String ACTION_QS                   = "**quicksettings**";
     public static final String ACTION_RECENTS              = "**recents**";
     public static final String ACTION_SCREENSHOT           = "**screenshot**";
     public static final String ACTION_IME                  = "**ime**";
@@ -53,6 +54,7 @@ public class ActionConstants {
     public static final String ACTION_MEDIA_NEXT           = "**media_next**";
     public static final String ACTION_MEDIA_PLAY_PAUSE     = "**media_play_pause**";
     public static final String ACTION_WAKE_DEVICE          = "**wake_device**";
+    public static final String ACTION_SMART_PULLDOWN       = "**smart_pulldown**";
 
     public static final String BROADCAST =                    "android.intent.action.NAVBAR_RING_EDIT";
     public static final String EDIT_STATE_EXTRA =             "edit_state_extra";

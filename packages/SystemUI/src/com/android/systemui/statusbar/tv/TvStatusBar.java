@@ -196,4 +196,8 @@ public class TvStatusBar extends BaseStatusBar {
     @Override
     public void onActivationReset(ActivatableNotificationView view) {
     }
+
+    @Override // CommandQueue
+    public void toggleSmartPulldown() {
+    }
 }

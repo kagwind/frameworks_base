@@ -160,7 +160,9 @@ public class DeviceUtils {
                 || action.equals(ActionConstants.ACTION_VIB)
                         && !deviceSupportsVibrator(context)
                 || action.equals(ActionConstants.ACTION_VIB_SILENT)
-                        && !deviceSupportsVibrator(context)) {
+                        && !deviceSupportsVibrator(context)
+                || action.equals(ActionConstants.ACTION_SMART_PULLDOWN)
+                        && isTablet(context)) {
             return false;
         }
         return true;

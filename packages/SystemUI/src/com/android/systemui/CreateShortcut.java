@@ -103,8 +103,7 @@ public class CreateShortcut extends LauncherActivity {
         mIntent.putExtra(Intent.EXTRA_SHORTCUT_NAME, mName);
         if (className.equals("ChamberOfSecrets")) {
             showDialogSetting(DLG_SECRET);
-        } else if (className.equals("Immersive")
-                || className.equals("Torch")
+        } else if (className.equals("Torch")
                 || className.equals("Rotation")) {
             showDialogSetting(DLG_TOGGLE);
         } else {
@@ -117,12 +116,16 @@ public class CreateShortcut extends LauncherActivity {
 
         if (c.equals("Rotation")) {
             return R.drawable.ic_qs_auto_rotate;
+        } else if (c.equals("Torch")) {
+            return R.drawable.ic_qs_flashlight_on;
+        } else if (c.equals("LastApp")) {
+            return R.drawable.ic_sysbar_lastapp;
         } else if (c.equals("Reboot")) {
             return R.drawable.ic_qs_reboot;
         } else if (c.equals("Recovery")) {
             return R.drawable.ic_qs_reboot_recovery;
-        } else if (c.equals("Torch")) {
-            return R.drawable.ic_qs_flashlight_on;
+        } else if (c.equals("Screenshot")) {
+            return R.drawable.ic_sysbar_screenshot;
         } else if (c.equals("ChamberOfSecrets")) {
             return R.drawable.ic_qs_slim_action;
         } else {

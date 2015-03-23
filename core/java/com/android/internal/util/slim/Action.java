@@ -70,6 +70,14 @@ public class Action {
                 Log.w("Action", "Error getting window manager service", e);
             }
 
+            boolean isKeyguardSecure = false;
+            try {
+                isKeyguardSecure =
+                        WindowManagerGlobal.getWindowManagerService().isKeyguardSecure();
+            } catch (RemoteException e) {
+                Log.w("Action", "Error getting window manager service", e);
+            }
+
             IStatusBarService barService = IStatusBarService.Stub.asInterface(
                     ServiceManager.getService(Context.STATUS_BAR_SERVICE));
             if (barService == null) {
@@ -133,8 +141,29 @@ public class Action {
                 }
                 return;
             } else if (action.equals(ActionConstants.ACTION_NOTIFICATIONS)) {
+                if (isKeyguardShowing && isKeyguardSecure) {
+                    return;
+                }
                 try {
                     barService.expandNotificationsPanel();
+                } catch (RemoteException e) {
+                }
+                return;
+            } else if (action.equals(ActionConstants.ACTION_QS)) {
+                if (isKeyguardShowing && isKeyguardSecure) {
+                    return;
+                }
+                try {
+                    barService.expandSettingsPanel();
+                } catch (RemoteException e) {
+                }
+                return;
+            } else if (action.equals(ActionConstants.ACTION_SMART_PULLDOWN)) {
+                if (isKeyguardShowing && isKeyguardSecure) {
+                    return;
+                }
+                try {
+                    barService.toggleSmartPulldown();
                 } catch (RemoteException e) {
                 }
                 return;
@@ -267,6 +296,12 @@ public class Action {
                     torchManager.setTorchEnabled(true);
                 } else {
                     torchManager.setTorchEnabled(false);
+                }
+                return;
+            } else if (action.equals(ActionConstants.ACTION_POWER_MENU)) {
+                try {
+                    WindowManagerGlobal.getWindowManagerService().toggleGlobalMenu();
+                } catch (RemoteException e) {
                 }
                 return;
             } else {
