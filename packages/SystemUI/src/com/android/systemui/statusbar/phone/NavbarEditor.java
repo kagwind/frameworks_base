@@ -114,12 +114,12 @@ public class NavbarEditor implements View.OnTouchListener {
             KeyEvent.KEYCODE_BACK, R.drawable.ic_sysbar_back,
             R.drawable.ic_sysbar_back_land, R.drawable.ic_sysbar_back_side);
     public static final ButtonInfo NAVBAR_SEARCH = new ButtonInfo("search",
-            R.string.navbar_search_button, R.string.accessibility_back,
+            R.string.navbar_search_button, R.string.accessibility_search_light,
             KeyEvent.KEYCODE_SEARCH, R.drawable.ic_sysbar_search,
             R.drawable.ic_sysbar_search_land, R.drawable.ic_sysbar_search_side);
     public static final ButtonInfo NAVBAR_RECENT = new ButtonInfo("recent",
             R.string.navbar_recent_button, R.string.accessibility_recent,
-            0, R.drawable.ic_sysbar_recent,
+            KeyEvent.KEYCODE_APP_SWITCH, R.drawable.ic_sysbar_recent,
             R.drawable.ic_sysbar_recent_land, R.drawable.ic_sysbar_recent_side);
     public static final ButtonInfo NAVBAR_CONDITIONAL_MENU = new ButtonInfo("menu0",
             R.string.navbar_menu_conditional_button, R.string.accessibility_menu,

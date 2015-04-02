@@ -2746,7 +2746,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
      * NOTE: This flag may only be used in subtreeSystemUiVisibility. It is masked
      * out of the public fields to keep the undefined bits out of the developer's way.
      *
-     * Flag to disable the big menu key. Don't use this
+     * Flag to disable the always-shown menu key. Don't use this
      * unless you're a special part of the system UI (i.e., setup wizard, keyguard).
      */
     public static final int STATUS_BAR_DISABLE_ALWAYS_MENU = 0x80000000;

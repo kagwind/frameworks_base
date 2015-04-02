@@ -58,6 +58,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.android.internal.util.slim.ActionConstants.*;
+import static com.android.internal.util.slim.NavigationRingConstants.*;
 import com.android.internal.util.slim.Action;
 
 public class SearchPanelView extends FrameLayout implements StatusBarPanel,

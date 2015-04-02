@@ -148,10 +148,6 @@
   <!-- Hardware key rebinding -->
   <java-symbol type="integer" name="config_deviceHardwareKeys" />
 
-  <!-- kill app long press back -->
-  <java-symbol type="string" name="app_killed_message" />
-  <java-symbol type="integer" name="config_backKillTimeout" />
-
   <!-- Doze stuff -->
   <java-symbol type="bool" name="config_invert_colors_on_doze" />
   <java-symbol type="bool" name="config_apply_grayscale_on_doze" />

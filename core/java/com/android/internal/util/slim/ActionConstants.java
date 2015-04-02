@@ -56,9 +56,6 @@ public class ActionConstants {
     public static final String ACTION_WAKE_DEVICE          = "**wake_device**";
     public static final String ACTION_SMART_PULLDOWN       = "**smart_pulldown**";
 
-    public static final String BROADCAST =                    "android.intent.action.NAVBAR_RING_EDIT";
-    public static final String EDIT_STATE_EXTRA =             "edit_state_extra";
-
     // no action
     public static final String ACTION_NULL            = "**null**";
 
