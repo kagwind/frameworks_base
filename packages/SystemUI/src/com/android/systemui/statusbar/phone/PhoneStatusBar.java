@@ -2256,10 +2256,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         flagdbg.append(((diff  & StatusBarManager.DISABLE_CLOCK) != 0) ? "* " : " ");
         flagdbg.append(((state & StatusBarManager.DISABLE_SEARCH) != 0) ? "SEARCH" : "search");
         flagdbg.append(((diff  & StatusBarManager.DISABLE_SEARCH) != 0) ? "* " : " ");
-        flagdbg.append(((state & StatusBarManager.DISABLE_MENU_BIG) != 0) ? "MENUBIG" : "menubig");
-        flagdbg.append(((diff  & StatusBarManager.DISABLE_MENU_BIG) != 0) ? "* " : " ");
-        flagdbg.append(((state & StatusBarManager.DISABLE_ALWAYS_MENU) != 0) ? "ALWAYSMENU" : "alwaysmenu");
-        flagdbg.append(((diff  & StatusBarManager.DISABLE_ALWAYS_MENU) != 0) ? "* " : " ");
         flagdbg.append(">");
         Log.d(TAG, flagdbg.toString());
 
@@ -2293,9 +2289,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         if ((diff & (StatusBarManager.DISABLE_HOME
                         | StatusBarManager.DISABLE_RECENT
                         | StatusBarManager.DISABLE_BACK
-                        | StatusBarManager.DISABLE_SEARCH
-                        | StatusBarManager.DISABLE_MENU_BIG
-                        | StatusBarManager.DISABLE_ALWAYS_MENU)) != 0) {
+                        | StatusBarManager.DISABLE_SEARCH)) != 0) {
             // the nav bar will take care of these
             if (mNavigationBarView != null) mNavigationBarView.setDisabledFlags(state);
 
@@ -3820,9 +3814,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         return !isDeviceProvisioned()
                 || mExpandedVisible
                 || (mNavigationBarView != null && mNavigationBarView.isInEditMode())
-                || (mDisabled & StatusBarManager.DISABLE_SEARCH
-                        & StatusBarManager.DISABLE_MENU_BIG
-                        & StatusBarManager.DISABLE_ALWAYS_MENU) != 0;
+                || (mDisabled & StatusBarManager.DISABLE_SEARCH) != 0;
     }
 
     public void postStartSettingsActivity(final Intent intent, int delay) {

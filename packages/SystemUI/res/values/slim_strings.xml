@@ -106,6 +106,8 @@
     <string name="navbar_menu_always_button">Menu (alwaysShow) button</string>
     <string name="navbar_menu_big_button">Menu button</string>
     <string name="navbar_power_button">Power button</string>
+    <string name="navbar_assist_button">Assist button</string>
+    <string name="navbar_camera_button">Camera button</string>
 
     <string name="accessibility_dpad_left">Cursor left</string>
     <string name="accessibility_dpad_right">Cursor right</string>

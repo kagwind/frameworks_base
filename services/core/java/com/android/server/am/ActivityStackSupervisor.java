@@ -3532,9 +3532,7 @@ public final class ActivityStackSupervisor implements DisplayListener {
                             if (!mLockTaskIsLocked) {
                                 flags ^= StatusBarManager.DISABLE_HOME
                                         | StatusBarManager.DISABLE_RECENT
-                                        | StatusBarManager.DISABLE_SEARCH
-                                        | StatusBarManager.DISABLE_MENU_BIG
-                                        | StatusBarManager.DISABLE_ALWAYS_MENU;
+                                        | StatusBarManager.DISABLE_SEARCH;
                             }
                             getStatusBarService().disable(flags, mToken,
                                     mService.mContext.getPackageName());

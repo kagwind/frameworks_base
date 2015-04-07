@@ -114,6 +114,7 @@ import com.android.internal.policy.impl.keyguard.KeyguardServiceDelegate.ShowLis
 import com.android.internal.statusbar.IStatusBarService;
 import com.android.internal.util.slim.ActionConstants;
 import com.android.internal.util.slim.HwKeyHelper;
+import com.android.internal.util.slim.VKeyHelper;
 import com.android.internal.util.slim.Action;
 import com.android.internal.widget.PointerLocationView;
 import com.android.server.LocalServices;
@@ -479,6 +480,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     boolean mHomePressed;
     boolean mHomeConsumed;
     boolean mHomeDoubleTapPending;
+    boolean mVHomeDoubleTapPending;
     boolean mMenuPressed;
     boolean mMenuConsumed;
     boolean mMenuDoubleTapPending;
@@ -488,12 +490,15 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     boolean mAppSwitchPressed;
     boolean mAppSwitchConsumed;
     boolean mAppSwitchDoubleTapPending;
+    boolean mVAppSwitchDoubleTapPending;
     boolean mAssistPressed;
     boolean mAssistConsumed;
     boolean mAssistDoubleTapPending;
+    boolean mVAssistDoubleTapPending;
     boolean mCameraPressed;
     boolean mCameraConsumed;
     boolean mCameraDoubleTapPending;
+    boolean mVCameraDoubleTapPending;
     Intent mHomeIntent;
     Intent mCarDockIntent;
     Intent mDeskDockIntent;
@@ -529,7 +534,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     private int mDeviceHardwareKeys;
     private boolean mDisableVibration;
 
-    // Tracks user-customisable behavior for certain key events
+    // Tracks user-customisable behavior for certain hardware key events
     private String mPressOnHomeBehavior          = ActionConstants.ACTION_NULL;
     private String mLongPressOnHomeBehavior      = ActionConstants.ACTION_NULL;
     private String mDoubleTapOnHomeBehavior      = ActionConstants.ACTION_NULL;
@@ -548,6 +553,18 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     private String mPressOnCameraBehavior        = ActionConstants.ACTION_NULL;
     private String mLongPressOnCameraBehavior    = ActionConstants.ACTION_NULL;
     private String mDoubleTapOnCameraBehavior    = ActionConstants.ACTION_NULL;
+
+    // Tracks user-customisable behavior for certain virtual key events
+    private String mVDoubleTapOnHomeBehavior      = ActionConstants.ACTION_NULL;
+    private String mVLongPressOnBackBehavior      = ActionConstants.ACTION_NULL;
+    private String mVPressOnAssistBehavior        = ActionConstants.ACTION_NULL;
+    private String mVLongPressOnAssistBehavior    = ActionConstants.ACTION_NULL;
+    private String mVDoubleTapOnAssistBehavior    = ActionConstants.ACTION_NULL;
+    private String mVLongPressOnAppSwitchBehavior = ActionConstants.ACTION_NULL;
+    private String mVDoubleTapOnAppSwitchBehavior = ActionConstants.ACTION_NULL;
+    private String mVPressOnCameraBehavior        = ActionConstants.ACTION_NULL;
+    private String mVLongPressOnCameraBehavior    = ActionConstants.ACTION_NULL;
+    private String mVDoubleTapOnCameraBehavior    = ActionConstants.ACTION_NULL;
 
     // Screenshot trigger states
     // Time to volume and power must be pressed within this interval of each other.
@@ -570,6 +587,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
     SettingsObserver mSettingsObserver;
     HwKeySettingsObserver mHwKeySettingsObserver;
+    VKeySettingsObserver mVKeySettingsObserver;
     ShortcutManager mShortcutManager;
     PowerManager.WakeLock mBroadcastWakeLock;
     boolean mHavePendingMediaKeyRepeatWithWakeLock;
@@ -798,6 +816,56 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         @Override
         public void onChange(boolean selfChange) {
             updateKeyAssignments();
+        }
+    }
+
+    class VKeySettingsObserver extends ContentObserver {
+        VKeySettingsObserver(Handler handler) {
+            super(handler);
+        }
+
+        void observe() {
+            // Observe all virtual key users' changes
+            ContentResolver resolver = mContext.getContentResolver();
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.VKEY_HOME_DOUBLE_TAP_ACTION), false, this,
+                    UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.VKEY_ASSIST_ACTION), false, this,
+                    UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.VKEY_ASSIST_LONG_PRESS_ACTION), false, this,
+                    UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.VKEY_ASSIST_DOUBLE_TAP_ACTION), false, this,
+                    UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.VKEY_APP_SWITCH_LONG_PRESS_ACTION), false, this,
+                    UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.VKEY_APP_SWITCH_DOUBLE_TAP_ACTION), false, this,
+                    UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.VKEY_BACK_LONG_PRESS_ACTION), false, this,
+                    UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.VIRTUAL_KEY_REBINDING), false, this,
+                    UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.VKEY_CAMERA_ACTION), false, this,
+                    UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.VKEY_CAMERA_LONG_PRESS_ACTION), false, this,
+                    UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.VKEY_CAMERA_DOUBLE_TAP_ACTION), false, this,
+                    UserHandle.USER_ALL);
+            updateVKeyAssignments();
+        }
+
+        @Override
+        public void onChange(boolean selfChange) {
+            updateVKeyAssignments();
         }
     }
 
@@ -1114,6 +1182,28 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         }
     };
 
+    private final Runnable mVDoubleTapTimeoutRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (mVHomeDoubleTapPending) {
+                mVHomeDoubleTapPending = false;
+                launchHomeFromHotKey();
+            }
+            if (mVAppSwitchDoubleTapPending) {
+                mVAppSwitchDoubleTapPending = false;
+                processAction(HwKeyHelper.getPressOnAppSwitchBehavior(mContext, true));
+            }
+            if (mVAssistDoubleTapPending) {
+                mVAssistDoubleTapPending = false;
+                processAction(mVPressOnAssistBehavior);
+            }
+            if (mVCameraDoubleTapPending) {
+                mVCameraDoubleTapPending = false;
+                processAction(mVPressOnCameraBehavior);
+            }
+        }
+    };
+
     /** {@inheritDoc} */
     @Override
     public void init(Context context, IWindowManager windowManager,
@@ -1140,6 +1230,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             mHwKeySettingsObserver = new HwKeySettingsObserver(mHandler);
             mHwKeySettingsObserver.observe();
         }
+
+        mVKeySettingsObserver = new VKeySettingsObserver(mHandler);
+        mVKeySettingsObserver.observe();
 
         mShortcutManager = new ShortcutManager(context, mHandler);
         mShortcutManager.observe();
@@ -1381,6 +1474,55 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         mDoubleTapOnCameraBehavior =
                 HwKeyHelper.getDoubleTapOnCameraBehavior(
                         mContext, noCamera || keyRebindingDisabled);
+    }
+
+    private void updateVKeyAssignments() {
+
+        // Setup virtual keys
+        boolean keyRebindingDisabled = Settings.System.getIntForUser(
+                mContext.getContentResolver(),
+                Settings.System.VIRTUAL_KEY_REBINDING, 0,
+                UserHandle.USER_CURRENT) == 0;
+
+        // Home button
+        mVDoubleTapOnHomeBehavior =
+                VKeyHelper.getDoubleTapOnHomeBehavior(
+                        mContext, keyRebindingDisabled);
+
+        // Back button
+        mVLongPressOnBackBehavior =
+                VKeyHelper.getLongPressOnBackBehavior(
+                        mContext, keyRebindingDisabled);
+
+        // Assist button
+        mVPressOnAssistBehavior =
+                VKeyHelper.getPressOnAssistBehavior(
+                        mContext, keyRebindingDisabled);
+        mVLongPressOnAssistBehavior =
+                VKeyHelper.getLongPressOnAssistBehavior(
+                        mContext, keyRebindingDisabled);
+        mVDoubleTapOnAssistBehavior =
+                VKeyHelper.getDoubleTapOnAssistBehavior(
+                        mContext, keyRebindingDisabled);
+
+        // App switcher button
+        mVLongPressOnAppSwitchBehavior =
+                VKeyHelper.getLongPressOnAppSwitchBehavior(
+                        mContext, keyRebindingDisabled);
+        mVDoubleTapOnAppSwitchBehavior =
+                VKeyHelper.getDoubleTapOnAppSwitchBehavior(
+                        mContext, keyRebindingDisabled);
+
+        // Camera button
+        mVPressOnCameraBehavior =
+                VKeyHelper.getPressOnCameraBehavior(
+                        mContext, keyRebindingDisabled);
+        mVLongPressOnCameraBehavior =
+                VKeyHelper.getLongPressOnCameraBehavior(
+                        mContext, keyRebindingDisabled);
+        mVDoubleTapOnCameraBehavior =
+                VKeyHelper.getDoubleTapOnCameraBehavior(
+                        mContext, keyRebindingDisabled);
     }
 
     @Override
@@ -2487,6 +2629,15 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 }
 
                 // Delay handling home if a double-tap is possible.
+                if (virtualKey
+                        && !mVDoubleTapOnHomeBehavior.equals(ActionConstants.ACTION_NULL)) {
+                    mHandler.removeCallbacks(mVDoubleTapTimeoutRunnable); // just in case
+                    mVHomeDoubleTapPending = true;
+                    mHandler.postDelayed(mVDoubleTapTimeoutRunnable,
+                            ViewConfiguration.getDoubleTapTimeout());
+                    return -1;
+                }
+
                 if (!virtualKey
                         && !mDoubleTapOnHomeBehavior.equals(ActionConstants.ACTION_NULL)) {
                     mHandler.removeCallbacks(mDoubleTapTimeoutRunnable); // just in case
@@ -2537,8 +2688,19 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             }
 
             if (virtualKey && down) {
-                mHomePressed = true;
-                mHomeConsumed = false;
+                if (!mPreloadedRecentApps &&
+                        mVDoubleTapOnHomeBehavior.equals(ActionConstants.ACTION_RECENTS)) {
+                    preloadRecentApps();
+                }
+                if (repeatCount == 0) {
+                    mHomePressed = true;
+                    if (mVHomeDoubleTapPending) {
+                        mVHomeDoubleTapPending = false;
+                        mHomeConsumed = true;
+                        mHandler.removeCallbacks(mVDoubleTapTimeoutRunnable);
+                        processAction(mVDoubleTapOnHomeBehavior);
+                    }
+                }
                 return -1;
             }
 
@@ -2690,6 +2852,15 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 }
 
                 // Delay handling AppSwitch if a double-tap is possible.
+                if (virtualKey
+                        && !mVDoubleTapOnAppSwitchBehavior.equals(ActionConstants.ACTION_NULL)) {
+                    mHandler.removeCallbacks(mVDoubleTapTimeoutRunnable); // just in case
+                    mVAppSwitchDoubleTapPending = true;
+                    mHandler.postDelayed(mVDoubleTapTimeoutRunnable,
+                            ViewConfiguration.getDoubleTapTimeout());
+                    return -1;
+                }
+
                 if (!virtualKey
                         && !mDoubleTapOnAppSwitchBehavior.equals(ActionConstants.ACTION_NULL)) {
                     mHandler.removeCallbacks(mDoubleTapTimeoutRunnable); // just in case
@@ -2712,13 +2883,23 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             }
 
             if (virtualKey && down) {
+                if (!mPreloadedRecentApps) {
+                    preloadRecentApps();
+                }
                 if (repeatCount == 0) {
                     mAppSwitchPressed = true;
-                    preloadRecentApps();
+                    if (mVAppSwitchDoubleTapPending) {
+                        mVAppSwitchDoubleTapPending = false;
+                        mAppSwitchConsumed = true;
+                        mHandler.removeCallbacks(mVDoubleTapTimeoutRunnable);
+                        processAction(mVDoubleTapOnAppSwitchBehavior);
+                    }
                 } else if (longPress) {
-                    if (!keyguardOn) {
-                        processAction(ActionConstants.ACTION_LAST_APP);
-                        mAppSwitchConsumed= true;
+                    if (!keyguardOn
+                            && !mVLongPressOnAppSwitchBehavior.equals(
+                                    ActionConstants.ACTION_NULL)) {
+                        mAppSwitchConsumed = true;
+                        processAction(mVLongPressOnAppSwitchBehavior);
                     }
                 }
                 return -1;
@@ -2768,6 +2949,15 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 }
 
                 // Delay handling assistant if a double-tap is possible.
+                if (virtualKey
+                        && !mVDoubleTapOnAssistBehavior.equals(ActionConstants.ACTION_NULL)) {
+                    mHandler.removeCallbacks(mVDoubleTapTimeoutRunnable); // just in case
+                    mVAssistDoubleTapPending = true;
+                    mHandler.postDelayed(mVDoubleTapTimeoutRunnable,
+                            ViewConfiguration.getDoubleTapTimeout());
+                    return -1;
+                }
+
                 if (!virtualKey
                         && !mDoubleTapOnAssistBehavior.equals(ActionConstants.ACTION_NULL)) {
                     mHandler.removeCallbacks(mDoubleTapTimeoutRunnable); // just in case
@@ -2785,13 +2975,32 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 }
 
                 // Nothing happened execute default action
-                processAction(HwKeyHelper.getPressOnAssistBehavior(mContext, true));
+                processAction(mVPressOnAssistBehavior);
                 return -1;
             }
 
             if (virtualKey && down) {
-                mAssistPressed = true;
-                mAssistConsumed = false;
+                if (!mPreloadedRecentApps &&
+                        (mVLongPressOnAssistBehavior.equals(ActionConstants.ACTION_RECENTS)
+                         || mVDoubleTapOnAssistBehavior.equals(ActionConstants.ACTION_RECENTS)
+                         || mVPressOnAssistBehavior.equals(ActionConstants.ACTION_RECENTS))) {
+                    preloadRecentApps();
+                }
+                if (repeatCount == 0) {
+                    mAssistPressed = true;
+                    if (mVAssistDoubleTapPending) {
+                        mVAssistDoubleTapPending = false;
+                        mAssistConsumed = true;
+                        mHandler.removeCallbacks(mVDoubleTapTimeoutRunnable);
+                        processAction(mVDoubleTapOnAssistBehavior);
+                    }
+                } else if (longPress) {
+                    if (!keyguardOn
+                            && !mVLongPressOnAssistBehavior.equals(ActionConstants.ACTION_NULL)) {
+                        mAssistConsumed = true;
+                        processAction(mVLongPressOnAssistBehavior);
+                    }
+                }
                 return -1;
             }
 
@@ -2823,8 +3032,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             }
             return -1;
         } else if (keyCode == KeyEvent.KEYCODE_CAMERA) {
-            // If we have released the assistant key, and didn't do anything else
-            // while it was pressed, then it is time to process the assistant action!
+            // If we have released the camera key, and didn't do anything else
+            // while it was pressed, then it is time to process the camera action!
             if (!down && mCameraPressed) {
                 mCameraPressed = false;
                 if (mCameraConsumed) {
@@ -2833,11 +3042,20 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 }
 
                 if (canceled) {
-                    Log.i(TAG, "Ignoring ASSIST; event canceled.");
+                    Log.i(TAG, "Ignoring CAMERA; event canceled.");
                     return -1;
                 }
 
                 // Delay handling assistant if a double-tap is possible.
+                if (virtualKey
+                        && !mVDoubleTapOnCameraBehavior.equals(ActionConstants.ACTION_NULL)) {
+                    mHandler.removeCallbacks(mVDoubleTapTimeoutRunnable); // just in case
+                    mVCameraDoubleTapPending = true;
+                    mHandler.postDelayed(mVDoubleTapTimeoutRunnable,
+                            ViewConfiguration.getDoubleTapTimeout());
+                    return -1;
+                }
+
                 if (!virtualKey
                         && !mDoubleTapOnCameraBehavior.equals(ActionConstants.ACTION_NULL)) {
                     mHandler.removeCallbacks(mDoubleTapTimeoutRunnable); // just in case
@@ -2855,13 +3073,32 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 }
 
                 // Nothing happened execute default action
-                processAction(HwKeyHelper.getPressOnCameraBehavior(mContext, true));
+                processAction(mVPressOnCameraBehavior);
                 return -1;
             }
 
             if (virtualKey && down) {
-                mAssistPressed = true;
-                mAssistConsumed = false;
+                if (!mPreloadedRecentApps &&
+                        (mVLongPressOnCameraBehavior.equals(ActionConstants.ACTION_RECENTS)
+                         || mVDoubleTapOnCameraBehavior.equals(ActionConstants.ACTION_RECENTS)
+                         || mVPressOnCameraBehavior.equals(ActionConstants.ACTION_RECENTS))) {
+                    preloadRecentApps();
+                }
+                if (repeatCount == 0) {
+                    mCameraPressed = true;
+                    if (mVCameraDoubleTapPending) {
+                        mVCameraDoubleTapPending = false;
+                        mCameraConsumed = true;
+                        mHandler.removeCallbacks(mVDoubleTapTimeoutRunnable);
+                        processAction(mVDoubleTapOnCameraBehavior);
+                    }
+                } else if (longPress) {
+                    if (!keyguardOn
+                            && !mVLongPressOnCameraBehavior.equals(ActionConstants.ACTION_NULL)) {
+                        mCameraConsumed = true;
+                        processAction(mVLongPressOnCameraBehavior);
+                    }
+                }
                 return -1;
             }
 
@@ -2989,9 +3226,10 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 if (repeatCount == 0) {
                     mBackPressed = true;
                 } else if (longPress) {
-                    if (!keyguardOn) {
-                        processAction(ActionConstants.ACTION_KILL);
+                    if (!keyguardOn
+                            && !mVLongPressOnBackBehavior.equals(ActionConstants.ACTION_NULL)) {
                         mBackConsumed = true;
+                        processAction(mVLongPressOnBackBehavior);
                     }
                 }
             } else if (down) {
@@ -5348,6 +5586,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 if (mHwKeySettingsObserver != null) {
                     mHwKeySettingsObserver.onChange(false);
                 }
+                mVKeySettingsObserver.onChange(false);
 
                 // force a re-application of focused window sysui visibility.
                 // the window may never have been shown for this user

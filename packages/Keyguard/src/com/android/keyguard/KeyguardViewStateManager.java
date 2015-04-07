@@ -155,12 +155,8 @@ public class KeyguardViewStateManager implements
             SlidingChallengeLayout scl = (SlidingChallengeLayout) mChallengeLayout;
             scl.setChallengeInteractive(!isCameraPage);
             final int currentFlags = mKeyguardWidgetPager.getSystemUiVisibility();
-            final int newFlags = isCameraPage ? (currentFlags | View.STATUS_BAR_DISABLE_SEARCH
-                                                    | View.STATUS_BAR_DISABLE_MENU_BIG
-                                                    | View.STATUS_BAR_DISABLE_ALWAYS_MENU)
-                    : (currentFlags & ~View.STATUS_BAR_DISABLE_SEARCH
-                            & -View.STATUS_BAR_DISABLE_MENU_BIG
-                            & -View.STATUS_BAR_DISABLE_ALWAYS_MENU);
+            final int newFlags = isCameraPage ? (currentFlags | View.STATUS_BAR_DISABLE_SEARCH)
+                    : (currentFlags & ~View.STATUS_BAR_DISABLE_SEARCH);
             mKeyguardWidgetPager.setSystemUiVisibility(newFlags);
         }
 

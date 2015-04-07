@@ -376,12 +376,8 @@ public class KeyguardHostView extends KeyguardViewBase {
 
             // Don't show camera or search in navbar when SIM or Account screen is showing
             setSystemUiVisibility(isSimOrAccount ?
-                    (getSystemUiVisibility() | View.STATUS_BAR_DISABLE_SEARCH
-                            | View.STATUS_BAR_DISABLE_MENU_BIG
-                            | View.STATUS_BAR_DISABLE_ALWAYS_MENU)
-                    : (getSystemUiVisibility() & ~View.STATUS_BAR_DISABLE_SEARCH
-                            & -View.STATUS_BAR_DISABLE_MENU_BIG
-                            & -View.STATUS_BAR_DISABLE_ALWAYS_MENU));
+                    (getSystemUiVisibility() | View.STATUS_BAR_DISABLE_SEARCH)
+                    : (getSystemUiVisibility() & ~View.STATUS_BAR_DISABLE_SEARCH));
 
             if (mSlidingChallengeLayout != null) {
                 mSlidingChallengeLayout.setChallengeInteractive(!isFullScreen);

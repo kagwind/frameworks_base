@@ -487,8 +487,7 @@ public class SlidingChallengeLayout extends ViewGroup implements ChallengeLayout
     @Override
     public void showBouncer() {
         if (mIsBouncing) return;
-        setSystemUiVisibility(getSystemUiVisibility() | STATUS_BAR_DISABLE_SEARCH
-                | STATUS_BAR_DISABLE_MENU_BIG | STATUS_BAR_DISABLE_ALWAYS_MENU);
+        setSystemUiVisibility(getSystemUiVisibility() | STATUS_BAR_DISABLE_SEARCH);
         mWasChallengeShowing = mChallengeShowing;
         mIsBouncing = true;
         showChallenge(true);
@@ -515,8 +514,7 @@ public class SlidingChallengeLayout extends ViewGroup implements ChallengeLayout
     @Override
     public void hideBouncer() {
         if (!mIsBouncing) return;
-        setSystemUiVisibility(getSystemUiVisibility() & ~STATUS_BAR_DISABLE_SEARCH
-                & -STATUS_BAR_DISABLE_MENU_BIG & -STATUS_BAR_DISABLE_ALWAYS_MENU);
+        setSystemUiVisibility(getSystemUiVisibility() & ~STATUS_BAR_DISABLE_SEARCH);
         if (!mWasChallengeShowing) showChallenge(false);
         mIsBouncing = false;
 

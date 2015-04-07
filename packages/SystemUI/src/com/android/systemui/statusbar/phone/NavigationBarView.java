@@ -305,7 +305,7 @@ public class NavigationBarView extends LinearLayout {
     }
 
     public View getMenu2Button() {
-        return mCurrentView.findViewWithTag(NavbarEditor.NAVBAR_CONDITIONAL_MENU);
+        return mCurrentView.findViewWithTag(NavbarEditor.NAVBAR_MENU_BIG);
     }
 
     public View getBackButton() {
@@ -318,6 +318,22 @@ public class NavigationBarView extends LinearLayout {
 
     public View getImeSwitchButton() {
         return mCurrentView.findViewById(R.id.ime_switcher);
+    }
+
+    public View getSearchButton() {
+        return mCurrentView.findViewWithTag(NavbarEditor.NAVBAR_SEARCH);
+    }
+
+    public View getPowerButton() {
+        return mCurrentView.findViewWithTag(NavbarEditor.NAVBAR_POWER);
+    }
+
+    public View getAssistButton() {
+        return mCurrentView.findViewWithTag(NavbarEditor.NAVBAR_ASSIST);
+    }
+
+    public View getCameraButton() {
+        return mCurrentView.findViewWithTag(NavbarEditor.NAVBAR_CAMERA);
     }
 
     private void getIcons(Resources res) {
@@ -411,12 +427,9 @@ public class NavigationBarView extends LinearLayout {
         final boolean disableBack = ((disabledFlags & View.STATUS_BAR_DISABLE_BACK) != 0)
                 && ((mNavigationIconHints & StatusBarManager.NAVIGATION_HINT_BACK_ALT) == 0);
         final boolean disableSearch = ((disabledFlags & View.STATUS_BAR_DISABLE_SEARCH) != 0);
-        final boolean disableMenuBig = ((disabledFlags & View.STATUS_BAR_DISABLE_MENU_BIG) != 0);
-        final boolean disableAlwaysMenu = ((disabledFlags & View.STATUS_BAR_DISABLE_ALWAYS_MENU) != 0);
 
         if (SLIPPERY_WHEN_DISABLED) {
-            setSlippery(disableHome && disableRecent && disableBack && disableSearch
-                    && disableMenuBig && disableAlwaysMenu);
+            setSlippery(disableHome && disableRecent && disableBack && disableSearch);
         }
 
         ViewGroup navButtons = (ViewGroup) mCurrentView.findViewById(R.id.nav_buttons);
@@ -440,9 +453,11 @@ public class NavigationBarView extends LinearLayout {
         setButtonWithTagVisibility(NavbarEditor.NAVBAR_HOME, !disableHome);
         setButtonWithTagVisibility(NavbarEditor.NAVBAR_RECENT, !disableRecent);
         setButtonWithTagVisibility(NavbarEditor.NAVBAR_SEARCH, !disableSearch);
-        setButtonWithTagVisibility(NavbarEditor.NAVBAR_MENU_BIG, !disableMenuBig);
-        setButtonWithTagVisibility(NavbarEditor.NAVBAR_ALWAYS_MENU, !disableAlwaysMenu);
+        setButtonWithTagVisibility(NavbarEditor.NAVBAR_MENU_BIG, !disableSearch);
+        setButtonWithTagVisibility(NavbarEditor.NAVBAR_ALWAYS_MENU, !disableSearch);
         setButtonWithTagVisibility(NavbarEditor.NAVBAR_POWER, !disableRecent);
+        setButtonWithTagVisibility(NavbarEditor.NAVBAR_ASSIST, !disableSearch);
+        setButtonWithTagVisibility(NavbarEditor.NAVBAR_CAMERA, !disableSearch);
 
         mBarTransitions.applyBackButtonQuiescentAlpha(mBarTransitions.getMode(), true /*animate*/);
     }
@@ -681,6 +696,10 @@ public class NavigationBarView extends LinearLayout {
         dumpButton(pw, "men0", getMenu0Button());
         dumpButton(pw, "men1", getMenu1Button());
         dumpButton(pw, "men2", getMenu2Button());
+        dumpButton(pw, "srch", getSearchButton());
+        dumpButton(pw, "powr", getPowerButton());
+        dumpButton(pw, "asis", getAssistButton());
+        dumpButton(pw, "camr", getCameraButton());
 
         pw.println("    }");
     }

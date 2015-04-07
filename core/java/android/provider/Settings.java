@@ -3372,6 +3372,87 @@ public final class Settings {
                 "key_camera_double_tap_action";
 
         /**
+         * Whether custom virtual key rebinding is enabled
+         * @hide
+         */
+        public static final String VIRTUAL_KEY_REBINDING = "virtual_key_rebinding";
+
+        /**
+         * Action to perform when the back key is long-pressed. (default: ACTION_NULL)
+         * (See ButtonsConstants.java for valid values)
+         * @hide
+         */
+        public static final String VKEY_BACK_LONG_PRESS_ACTION = "vkey_back_long_press_action";
+
+        /**
+         * Action to perform when the home key is double taped. (default: ACTION_NULL)
+         * (See ButtonsConstants.java for valid values)
+         * @hide
+         */
+        public static final String VKEY_HOME_DOUBLE_TAP_ACTION = "vkey_home_double_tap_action";
+
+        /**
+         * Action to perform when the assistant (search) key is pressed. (default: ACTION_SEARCH)
+         * (See ButtonsConstants.java for valid values)
+         * @hide
+         */
+        public static final String VKEY_ASSIST_ACTION = "vkey_assist_action";
+
+        /**
+         * Action to perform when the assistant (search) key is long-pressed.
+         * (default: ACTION_VOICE_SEARCH)
+         * (See ButtonsConstants.java for valid values)
+         * @hide
+         */
+        public static final String VKEY_ASSIST_LONG_PRESS_ACTION = "vkey_assist_long_press_action";
+
+        /**
+         * Action to perform when the assistant (search) key is double tapped.
+         * (default: ACTION_NULL) (See ButtonsConstants.java for valid values)
+         * @hide
+         */
+        public static final String VKEY_ASSIST_DOUBLE_TAP_ACTION = "vkey_assist_double_tap_action";
+
+        /**
+         * Action to perform when the app switch key is long-pressed. (default: ACTION_NULL)
+         * (See ButtonsConstants.java for valid values)
+         * @hide
+         */
+        public static final String VKEY_APP_SWITCH_LONG_PRESS_ACTION =
+                "vkey_app_switch_long_press_action";
+
+        /**
+         * Action to perform when the app switch key is double tapped. (default: ACTION_NULL)
+         * (See ButtonsConstants.java for valid values)
+         * @hide
+         */
+        public static final String VKEY_APP_SWITCH_DOUBLE_TAP_ACTION =
+                "vkey_app_switch_double_tap_action";
+
+        /**
+         * Action to perform when the camera key is pressed. (default: LAUNCH_CAMERA)
+         * (See ButtonsConstants.java for valid values)
+         * @hide
+         */
+        public static final String VKEY_CAMERA_ACTION = "vkey_camera_action";
+
+        /**
+         * Action to perform when the camera key is long-pressed. (default: ACTION_NULL)
+         * (See ButtonsConstants.java for valid values)
+         * @hide
+         */
+        public static final String VKEY_CAMERA_LONG_PRESS_ACTION =
+                "vkey_camera_long_press_action";
+
+        /**
+         * Action to perform when the camera key is double tapped. (default: ACTION_NULL)
+         * (See ButtonsConstants.java for valid values)
+         * @hide
+         */
+        public static final String VKEY_CAMERA_DOUBLE_TAP_ACTION =
+                "vkey_camera_double_tap_action";
+
+        /**
          * Forces formal text input.  1 to replace emoticon key with enter key.
          * @hide
          */

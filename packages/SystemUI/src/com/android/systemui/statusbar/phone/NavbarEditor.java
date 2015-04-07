@@ -145,10 +145,19 @@ public class NavbarEditor implements View.OnTouchListener {
             R.string.navbar_power_button, R.string.accessibility_power,
             KeyEvent.KEYCODE_POWER, R.drawable.ic_sysbar_power, R.drawable.ic_sysbar_power_land,
             R.drawable.ic_sysbar_power_side);
+    public static final ButtonInfo NAVBAR_ASSIST = new ButtonInfo("assist",
+            R.string.navbar_assist_button, R.string.accessibility_search_light,
+            KeyEvent.KEYCODE_ASSIST, R.drawable.ic_sysbar_search,
+            R.drawable.ic_sysbar_search_land, R.drawable.ic_sysbar_search_side);
+    public static final ButtonInfo NAVBAR_CAMERA = new ButtonInfo("camera",
+            R.string.navbar_camera_button, R.string.accessibility_camera_button,
+            KeyEvent.KEYCODE_CAMERA, R.drawable.ic_sysbar_camera, R.drawable.ic_sysbar_camera_land,
+            R.drawable.ic_sysbar_camera);
 
     private static final ButtonInfo[] ALL_BUTTONS = new ButtonInfo[] {
         NAVBAR_EMPTY, NAVBAR_HOME, NAVBAR_BACK, NAVBAR_SEARCH,
-        NAVBAR_RECENT, NAVBAR_CONDITIONAL_MENU, NAVBAR_ALWAYS_MENU, NAVBAR_MENU_BIG, NAVBAR_POWER
+        NAVBAR_RECENT, NAVBAR_CONDITIONAL_MENU, NAVBAR_ALWAYS_MENU, NAVBAR_MENU_BIG, NAVBAR_POWER,
+        NAVBAR_ASSIST, NAVBAR_CAMERA
     };
 
     private static final String DEFAULT_SETTING_STRING = "empty|empty|back|home|recent|empty|menu0";
@@ -403,7 +412,7 @@ public class NavbarEditor implements View.OnTouchListener {
         }
 
         if (isDevicePhone(mContext)) {
-                adjustPadding(visibleCount);
+            adjustPadding(visibleCount);
         }
         updateLowLights(visibleCount);
     }
