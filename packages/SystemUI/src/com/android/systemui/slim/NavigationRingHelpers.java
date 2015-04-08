@@ -33,6 +33,7 @@ import com.android.systemui.R;
 import java.net.URISyntaxException;
 
 import static com.android.internal.util.slim.ActionConstants.*;
+import com.android.internal.util.slim.DeviceUtils;
 
 public class NavigationRingHelpers {
     public static final int MAX_ACTIONS = 3;
@@ -89,8 +90,7 @@ public class NavigationRingHelpers {
     }
 
     public static boolean isTorchAvailable(Context context) {
-        TorchManager torchManager = (TorchManager) context.getSystemService(Context.TORCH_SERVICE);
-        return torchManager.isTorchSupported();
+        return DeviceUtils.deviceSupportsTorch(context);
     }
 
     public static Drawable getTargetDrawable(Context context, String action) {
