@@ -2698,6 +2698,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                         mVHomeDoubleTapPending = false;
                         mHomeConsumed = true;
                         mHandler.removeCallbacks(mVDoubleTapTimeoutRunnable);
+                        mHandler.post(mVDoubleTapTimeoutRunnable);
                         processAction(mVDoubleTapOnHomeBehavior);
                     }
                 }
@@ -2892,6 +2893,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                         mVAppSwitchDoubleTapPending = false;
                         mAppSwitchConsumed = true;
                         mHandler.removeCallbacks(mVDoubleTapTimeoutRunnable);
+                        mHandler.post(mVDoubleTapTimeoutRunnable);
                         processAction(mVDoubleTapOnAppSwitchBehavior);
                     }
                 } else if (longPress) {
@@ -2992,6 +2994,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                         mVAssistDoubleTapPending = false;
                         mAssistConsumed = true;
                         mHandler.removeCallbacks(mVDoubleTapTimeoutRunnable);
+                        mHandler.post(mVDoubleTapTimeoutRunnable);
                         processAction(mVDoubleTapOnAssistBehavior);
                     }
                 } else if (longPress) {
@@ -3090,6 +3093,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                         mVCameraDoubleTapPending = false;
                         mCameraConsumed = true;
                         mHandler.removeCallbacks(mVDoubleTapTimeoutRunnable);
+                        mHandler.post(mVDoubleTapTimeoutRunnable);
                         processAction(mVDoubleTapOnCameraBehavior);
                     }
                 } else if (longPress) {
