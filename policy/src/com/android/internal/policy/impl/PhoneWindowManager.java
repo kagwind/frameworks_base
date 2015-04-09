@@ -3396,10 +3396,11 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         }
         if (!action.equals(ActionConstants.ACTION_RECENTS)) {
             cancelPreloadRecentApps();
+        } else {
+            // Reset the check flag for preloading to give it free
+            // for next preload call.
+            mPreloadedRecentApps = false;
         }
-        // Reset the check flag for preloading to give it free
-        // for next preload call.
-        mPreloadedRecentApps = false;
         Action.processAction(mContext, action, false);
     }
 
