@@ -763,11 +763,11 @@ public class NavigationBarView extends LinearLayout {
         if (homeView != null) {
             homeView.setOnTouchListener(mHomeSearchActionListener);
         }
-        View powerView = mCurrentView.findViewWithTag(NavbarEditor.NAVBAR_POWER);
-        if (powerView != null) {
-            powerView.setLongClickable(true);
-            powerView.setOnLongClickListener(mPowerListener);
-        }
+//        View powerView = mCurrentView.findViewWithTag(NavbarEditor.NAVBAR_POWER);
+//        if (powerView != null) {
+//            powerView.setLongClickable(true);
+//            powerView.setOnLongClickListener(mPowerListener);
+//        }
     }
 
     public boolean isInEditMode() {
