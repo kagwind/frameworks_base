@@ -18,6 +18,8 @@
 package com.android.internal.util.slim;
 
 public class NavigationRingConstants {
+    public static final int MAX_ACTIONS = 3;
+
     public static final String BROADCAST =                    "android.intent.action.NAVBAR_RING_EDIT";
     public static final String EDIT_STATE_EXTRA =             "edit_state_extra";
 }

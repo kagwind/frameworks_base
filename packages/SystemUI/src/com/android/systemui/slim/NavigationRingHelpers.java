@@ -33,11 +33,11 @@ import com.android.systemui.R;
 import java.net.URISyntaxException;
 
 import static com.android.internal.util.slim.ActionConstants.*;
+import static com.android.internal.util.slim.NavigationRingConstants.*;
 import com.android.internal.util.slim.DeviceUtils;
 import com.android.internal.util.slim.ActionHelper;
 
 public class NavigationRingHelpers {
-    public static final int MAX_ACTIONS = 3;
 
     private NavigationRingHelpers() {
         // Do nothing here
@@ -57,7 +57,34 @@ public class NavigationRingHelpers {
 
         if (isDefault) {
             resetActionsToDefaults(context);
+            result[0] = ACTION_NULL;
             result[1] = ACTION_ASSIST;
+            result[2] = ACTION_NULL;
+        }
+
+        filterAction(result, ACTION_ASSIST, isAssistantAvailable(context));
+        filterAction(result, ACTION_TORCH, isTorchAvailable(context));
+
+        return result;
+    }
+
+    public static String[] getTargetLongActions(Context context) {
+        final ContentResolver cr = context.getContentResolver();
+        final String[] result = new String[MAX_ACTIONS];
+        boolean isDefault = true;
+
+        for (int i = 0; i < MAX_ACTIONS; i++) {
+            result[i] = Settings.Secure.getString(cr, Settings.Secure.NAVIGATION_RING_LONGPRESS_TARGETS[i]);
+            if (result[i] != null) {
+                isDefault = false;
+            }
+        }
+
+        if (isDefault) {
+            resetLongActionsToDefaults(context);
+            result[0] = ACTION_NULL;
+            result[1] = ACTION_NULL;
+            result[2] = ACTION_NULL;
         }
 
         filterAction(result, ACTION_ASSIST, isAssistantAvailable(context));
@@ -80,9 +107,16 @@ public class NavigationRingHelpers {
 
     public static void resetActionsToDefaults(Context context) {
         final ContentResolver cr = context.getContentResolver();
-        Settings.Secure.putString(cr, Settings.Secure.NAVIGATION_RING_TARGETS[0], null);
+        Settings.Secure.putString(cr, Settings.Secure.NAVIGATION_RING_TARGETS[0], ACTION_NULL);
         Settings.Secure.putString(cr, Settings.Secure.NAVIGATION_RING_TARGETS[1], ACTION_ASSIST);
-        Settings.Secure.putString(cr, Settings.Secure.NAVIGATION_RING_TARGETS[2], null);
+        Settings.Secure.putString(cr, Settings.Secure.NAVIGATION_RING_TARGETS[2], ACTION_NULL);
+    }
+
+    public static void resetLongActionsToDefaults(Context context) {
+        final ContentResolver cr = context.getContentResolver();
+        Settings.Secure.putString(cr, Settings.Secure.NAVIGATION_RING_LONGPRESS_TARGETS[0], ACTION_NULL);
+        Settings.Secure.putString(cr, Settings.Secure.NAVIGATION_RING_LONGPRESS_TARGETS[1], ACTION_NULL);
+        Settings.Secure.putString(cr, Settings.Secure.NAVIGATION_RING_LONGPRESS_TARGETS[2], ACTION_NULL);
     }
 
     public static boolean isAssistantAvailable(Context context) {

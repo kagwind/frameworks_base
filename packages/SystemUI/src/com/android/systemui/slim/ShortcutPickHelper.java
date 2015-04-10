@@ -66,7 +66,7 @@ public class ShortcutPickHelper {
     private List<ItemInfo> mItems;
 
     public interface OnPickListener {
-        void shortcutPicked(String uri);
+        void shortcutPicked(String uri, final boolean longPress);
     }
 
     public ShortcutPickHelper(Context context, OnPickListener listener) {
@@ -199,7 +199,7 @@ public class ShortcutPickHelper {
         }
     }
 
-    private void pickApp() {
+    private void pickApp(final boolean longPress) {
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext)
                 .setTitle(R.string.navbar_dialog_title)
                 .setAdapter(mAdapter, new DialogInterface.OnClickListener() {
@@ -208,14 +208,14 @@ public class ShortcutPickHelper {
                         ItemInfo info = mAdapter.getItem(which);
                         Intent intent = new Intent(mBaseIntent);
                         intent.setComponent(info.componentName);
-                        mListener.shortcutPicked(intent.toUri(0));
+                        mListener.shortcutPicked(intent.toUri(0), longPress);
                         dialog.dismiss();
                     }
                 })
                 .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-                        mListener.shortcutPicked(null);
+                        mListener.shortcutPicked(null, longPress);
                         dialog.cancel();
                     }
                 });
@@ -225,7 +225,7 @@ public class ShortcutPickHelper {
         dialog.show();
     }
 
-    public void pickShortcut(boolean showNone) {
+    public void pickShortcut(boolean showNone, final boolean longPress) {
         if (mFetchAppsTask == null) {
             mFetchAppsTask = new FetchAppsTask();
             mFetchAppsTask.execute();
@@ -236,7 +236,7 @@ public class ShortcutPickHelper {
             filter.addDataScheme("package");
             mContext.registerReceiver(mReceiver, filter);
         }
-        if (showNone) {
+        if (showNone || longPress) {
             mActions.addAction(ACTION_NULL, R.string.navring_action_none, 0);
         } else {
             mActions.removeAction(ACTION_NULL);
@@ -248,17 +248,17 @@ public class ShortcutPickHelper {
                     public void onClick(DialogInterface dialog, int which) {
                         String item = mActions.getAction(which);
                         if (item.equals(ACTION_APP)) {
-                            pickApp();
+                            pickApp(longPress);
                             dialog.dismiss();
                         } else {
-                            mListener.shortcutPicked(item);
+                            mListener.shortcutPicked(item, longPress);
                         }
                     }
                 })
                 .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-                        mListener.shortcutPicked(null);
+                        mListener.shortcutPicked(null, longPress);
                         dialog.cancel();
                     }
                 });

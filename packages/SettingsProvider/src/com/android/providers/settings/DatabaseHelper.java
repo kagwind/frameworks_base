@@ -1864,6 +1864,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             moveSettingsToNewTable(db, TABLE_SYSTEM, TABLE_SECURE,
                     settingsToMove, true);
+
+            settingsToMove = Settings.Secure.NAVIGATION_RING_LONGPRESS_TARGETS;
+
+            moveSettingsToNewTable(db, TABLE_SYSTEM, TABLE_SECURE,
+                    settingsToMove, true);
+
             upgradeVersion = 116;
         }
 
