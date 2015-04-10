@@ -61,7 +61,7 @@ public class ActionConstants {
 
     // this shorcut constant is only used to identify if the user
     // selected in settings a custom app...after it is choosed intent uri
-    // is saved in the ButtonConfig object
+    // is saved in the ActionConfig object
     public static final String ACTION_APP          = "**app**";
 
     public static final String ICON_EMPTY = "empty";

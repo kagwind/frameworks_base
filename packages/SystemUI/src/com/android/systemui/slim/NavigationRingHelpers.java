@@ -34,6 +34,7 @@ import java.net.URISyntaxException;
 
 import static com.android.internal.util.slim.ActionConstants.*;
 import com.android.internal.util.slim.DeviceUtils;
+import com.android.internal.util.slim.ActionHelper;
 
 public class NavigationRingHelpers {
     public static final int MAX_ACTIONS = 3;
@@ -116,6 +117,9 @@ public class NavigationRingHelpers {
             resourceId = getTorchDrawableResId(context);
         } else if (action.equals(ACTION_ASSIST)) {
             resourceId = R.drawable.ic_navigation_ring_search;
+        } else {
+            // SlimActions without pre-defined navring icon, try to use navbar icon instead for now
+            resourceId = ActionHelper.getActionIconUri(context, action, null);
         }
 
         if (resourceId < 0) {
@@ -137,6 +141,7 @@ public class NavigationRingHelpers {
         return context.getResources().getDrawable(resourceId);
     }
 
+    // TODO: doesn't seem to work as intended.
     private static int getVibrateDrawableResId(Context context) {
         AudioManager am = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         if (am.getRingerMode() != AudioManager.RINGER_MODE_VIBRATE) {
