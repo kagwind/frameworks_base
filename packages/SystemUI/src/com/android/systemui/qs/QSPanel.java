@@ -455,6 +455,10 @@ public class QSPanel extends ViewGroup {
 
             mDetailContent.removeAllViews();
             mDetail.bringToFront();
+            ViewGroup parent = (ViewGroup) r.detailView.getParent();
+            if (parent != null) {
+                parent.removeView(r.detailView);
+            }
             mDetailContent.addView(r.detailView);
             setDetailRecord(r);
             listener = mHideGridContentWhenDone;
