@@ -32,7 +32,8 @@ public class ActionChecker {
 
     public static boolean actionConfigContainsAction(ActionConfig config, String action) {
         return action.equals(config.getClickAction())
-                || action.equals(config.getLongpressAction());
+                || action.equals(config.getLongpressAction())
+                || action.equals(config.getDoubleTapAction());
     }
 
     public static boolean containsAction(Context context,
