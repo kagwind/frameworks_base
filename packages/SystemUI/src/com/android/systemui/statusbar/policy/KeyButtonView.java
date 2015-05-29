@@ -72,6 +72,7 @@ public class KeyButtonView extends ImageView {
     private long mDownTime;
     private int mCode;
     String mClickAction;
+    String mDoubleTapAction;
     String mLongpressAction;
     private int mTouchSlop;
     private float mDrawingAlpha = 1f;
@@ -160,8 +161,18 @@ public class KeyButtonView extends ImageView {
     }
 
     public void setClickAction(String action) {
-        mClickAction = action;
-        setOnClickListener(mClickListener);
+        setClickAction(action, ActionConstants.ACTION_NULL);
+    }
+
+    public void setClickAction(String clickAction, String tapAction) {
+        mClickAction = clickAction;
+        mDoubleTapAction = tapAction;
+        if (tapAction == null
+                    || tapAction.equals(ActionConstants.ACTION_NULL)) {
+            setOnClickListener(mClickListener);
+        } else {
+            setOnClickListener(mDoubleClickListener);
+        }
     }
 
     public void setLongpressAction(String action) {
@@ -316,10 +327,55 @@ public class KeyButtonView extends ImageView {
         mAudioManager.playSoundEffect(soundConstant, ActivityManager.getCurrentUser());
     };
 
+
+    public abstract class DoubleClickListener implements OnClickListener {
+
+        private boolean mDoubleTapPending = false;
+
+        private final Handler mHandler = new Handler();
+
+        private final Runnable mDoubleTapTimeoutRunnable = new Runnable() {
+            public void run() {
+                mDoubleTapPending = false;
+                onSingleClick();
+            }
+        };
+
+        @Override
+        public void onClick(View v) {
+            if (mDoubleTapPending) {
+                mDoubleTapPending = false;
+                mHandler.removeCallbacks(mDoubleTapTimeoutRunnable);
+                onDoubleTap();
+            } else {
+                mDoubleTapPending = true;
+                mHandler.postDelayed(mDoubleTapTimeoutRunnable,
+                        ViewConfiguration.getDoubleTapTimeout());
+            }
+        }
+
+        protected abstract void onSingleClick();
+        protected abstract void onDoubleTap();
+    }
+
     private OnClickListener mClickListener = new OnClickListener() {
         @Override
         public void onClick(View v) {
             Action.processAction(mContext, mClickAction, false);
+            return;
+        }
+    };
+
+    private DoubleClickListener mDoubleClickListener = new DoubleClickListener() {
+        @Override
+        protected void onSingleClick() {
+            Action.processAction(mContext, mClickAction, false);
+            return;
+        }
+
+        @Override
+        protected void onDoubleTap() {
+            Action.processAction(mContext, mDoubleTapAction, false);
             return;
         }
     };
