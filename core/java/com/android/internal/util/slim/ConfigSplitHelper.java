@@ -48,7 +48,7 @@ public class ConfigSplitHelper {
             if (counter == 1) {
                 actionConfig = new ActionConfig(configValue,
                             AppHelper.getProperSummary(context, pm, settingsResources,
-                            configValue, values, entries), null, null, null);
+                            configValue, values, entries), null, null, null, null, null);
             }
             if (counter == 2) {
                 if (isShortcut) {
@@ -64,6 +64,12 @@ public class ConfigSplitHelper {
                 }
             }
             if (counter == 3) {
+                    actionConfig.setDoubleTapAction(configValue);
+                    actionConfig.setDoubleTapActionDescription(
+                            AppHelper.getProperSummary(context, pm, settingsResources,
+                            configValue, values, entries));
+            }
+            if (counter == 4) {
                 actionConfig.setIcon(configValue);
                 actionConfigList.add(actionConfig);
                 //reset counter due that iteration of full config action is finished
@@ -87,6 +93,8 @@ public class ConfigSplitHelper {
             finalConfig += actionConfig.getClickAction() + ActionConstants.ACTION_DELIMITER;
             if (!isShortcut) {
                 finalConfig += actionConfig.getLongpressAction()
+                    + ActionConstants.ACTION_DELIMITER
+                    + actionConfig.getDoubleTapAction()
                     + ActionConstants.ACTION_DELIMITER;
             }
             finalConfig += actionConfig.getIcon();
