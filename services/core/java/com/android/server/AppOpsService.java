@@ -40,6 +40,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.IPackageManager;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.media.AudioAttributes;
@@ -1673,6 +1674,28 @@ public class AppOpsService extends IAppOpsService.Stub {
             isShow = mPolicy.isControlAllowed(code, packageName);
         }
         return isShow;
+    }
+
+    @Override
+    public boolean hasPrivacyGuardOpsForPackage(String packageName) {
+        PackageInfo pkgInfo;
+        try {
+            pkgInfo = mContext.getPackageManager()
+                    .getPackageInfo(packageName, PackageManager.GET_PERMISSIONS);
+        } catch (NameNotFoundException e) {
+            return false;
+        }
+
+        final String[] requestedPermissions = pkgInfo.requestedPermissions;
+        if (requestedPermissions != null) {
+            for (String requested : requestedPermissions) {
+                boolean hasOp = AppOpsManager.hasPrivacyGuardOp(requested);
+                if (hasOp) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     @Override

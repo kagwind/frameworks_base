@@ -1278,6 +1278,19 @@ public class AppOpsManager {
     }
 
     /**
+     * Retrieve whether the permission is handled by privacy guard.
+     * @hide
+     */
+    public static boolean hasPrivacyGuardOp(String permission) {
+        for (int i=0; i<sOpPerms.length; i++) {
+            if (sOpPerms[i] != null && sOpPerms[i].equals(permission)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Retrieve the default mode for the operation.
      * @hide
      */
@@ -1960,6 +1973,15 @@ public class AppOpsManager {
         } catch (RemoteException e) {
         }
         return isShow;
+    }
+
+    /** @hide */
+    public boolean hasPrivacyGuardOpsForPackage(String packageName) {
+        try {
+            return mService.hasPrivacyGuardOpsForPackage(packageName);
+        } catch (RemoteException e) {
+        }
+        return false;
     }
 
     /** @hide */
