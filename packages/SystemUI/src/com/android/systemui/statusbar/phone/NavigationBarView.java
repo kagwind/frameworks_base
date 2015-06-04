@@ -734,6 +734,14 @@ public class NavigationBarView extends LinearLayout implements BaseStatusBar.Nav
             }
         }
 
+        if (disableHome) {
+            getLeftMenuButton().setVisibility(View.INVISIBLE);
+            getRightMenuButton().setVisibility(View.INVISIBLE);
+            getImeSwitchButton().setVisibility(View.GONE);
+            getLeftImeArrowButton().setVisibility(View.GONE);
+            getRightImeArrowButton().setVisibility(View.GONE);
+        }
+
         mBarTransitions.applyBackButtonQuiescentAlpha(mBarTransitions.getMode(), true /*animate*/);
     }
 
@@ -845,8 +853,8 @@ public class NavigationBarView extends LinearLayout implements BaseStatusBar.Nav
 
         // force the low profile & disabled states into compliance
         mBarTransitions.init(mVertical);
-        setDisabledFlags(mDisabledFlags, true /* force */);
         setMenuVisibility(mShowMenu, true /* force */);
+        setDisabledFlags(mDisabledFlags, true /* force */);
 
         if (DEBUG) {
             Log.d(TAG, "reorient(): rot=" + mDisplay.getRotation());
