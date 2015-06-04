@@ -1064,6 +1064,35 @@ public class NavigationBarView extends LinearLayout implements BaseStatusBar.Nav
 
     }
 
+    private class SettingsObserver extends ContentObserver {
+
+        SettingsObserver(Handler handler) {
+            super(handler);
+        }
+
+        void observe() {
+            ContentResolver resolver = mContext.getContentResolver();
+            resolver.registerContentObserver(
+                    Settings.System.getUriFor(Settings.System.STATUS_BAR_IME_ARROWS),
+                    false, this);
+
+            onChange(false);
+        }
+
+        void unobserve() {
+            mContext.getContentResolver().unregisterContentObserver(this);
+        }
+
+        @Override
+        public void onChange(boolean selfChange) {
+            mImeArrowVisibility = (Settings.System.getIntForUser(resolver,
+                        Settings.System.STATUS_BAR_IME_ARROWS, HIDE_IME_ARROW,
+                        UserHandle.USER_CURRENT) == SHOW_IME_ARROW);
+            setNavigationIconHints(mNavigationIconHints, true);
+        }
+    }
+
+
     public void setForgroundColor(Drawable drawable) {
         if (mRot0 != null) {
             mRot0.setForeground(drawable);
