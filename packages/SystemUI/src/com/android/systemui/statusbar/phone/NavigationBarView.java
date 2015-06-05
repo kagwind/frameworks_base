@@ -29,6 +29,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.database.ContentObserver;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
@@ -156,6 +157,8 @@ public class NavigationBarView extends LinearLayout implements BaseStatusBar.Nav
     private boolean mIsLayoutRtl;
     private boolean mDelegateIntercepted;
 
+    private SettingsObserver mSettingsObserver;
+
     private class NavTransitionListener implements TransitionListener {
         private boolean mBackTransitioning;
         private boolean mHomeAppearing;
@@ -252,6 +255,20 @@ public class NavigationBarView extends LinearLayout implements BaseStatusBar.Nav
 
         mButtonsConfig = ActionHelper.getNavBarConfig(mContext);
         mButtonIdList = new ArrayList<Integer>();
+
+        mSettingsObserver = new SettingsObserver(new Handler());
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        mSettingsObserver.observe();
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        mSettingsObserver.unobserve();
     }
 
     public BarTransitions getBarTransitions() {
@@ -1079,8 +1096,7 @@ public class NavigationBarView extends LinearLayout implements BaseStatusBar.Nav
         }
 
         void observe() {
-            ContentResolver resolver = mContext.getContentResolver();
-            resolver.registerContentObserver(
+            mContext.getContentResolver().registerContentObserver(
                     Settings.System.getUriFor(Settings.System.STATUS_BAR_IME_ARROWS),
                     false, this);
 
@@ -1093,9 +1109,10 @@ public class NavigationBarView extends LinearLayout implements BaseStatusBar.Nav
 
         @Override
         public void onChange(boolean selfChange) {
-            mImeArrowVisibility = (Settings.System.getIntForUser(resolver,
-                        Settings.System.STATUS_BAR_IME_ARROWS, HIDE_IME_ARROW,
-                        UserHandle.USER_CURRENT) == SHOW_IME_ARROW);
+            mImeArrowVisibility =
+                    (Settings.System.getIntForUser(mContext.getContentResolver(),
+                            Settings.System.STATUS_BAR_IME_ARROWS, HIDE_IME_ARROW,
+                            UserHandle.USER_CURRENT) == SHOW_IME_ARROW);
             setNavigationIconHints(mNavigationIconHints, true);
         }
     }
