@@ -40,7 +40,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.IPackageManager;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.media.AudioAttributes;
@@ -524,6 +523,10 @@ public class AppOpsService extends IAppOpsService.Stub {
 
     @Override
     public void setMode(int code, int uid, String packageName, int mode) {
+        setMode(code, uid, packageName, mode, true);
+    }
+
+    public void setMode(int code, int uid, String packageName, int mode, boolean force) {
         if (Binder.getCallingPid() != Process.myPid()) {
             mContext.enforcePermission(android.Manifest.permission.UPDATE_APP_OPS_STATS,
                     Binder.getCallingPid(), Binder.getCallingUid(), null);
@@ -532,7 +535,7 @@ public class AppOpsService extends IAppOpsService.Stub {
         ArrayList<Callback> repCbs = null;
         code = AppOpsManager.opToSwitch(code);
         synchronized (this) {
-            Op op = getOpLocked(code, uid, packageName, true);
+            Op op = getOpLocked(code, uid, packageName, force);
             if (op != null) {
                 if (op.mode != mode) {
                     op.mode = mode;
@@ -1747,21 +1750,12 @@ public class AppOpsService extends IAppOpsService.Stub {
 
     @Override
     public boolean hasPrivacyGuardOpsForPackage(int uid, String packageName) {
-        mContext.enforcePermission(android.Manifest.permission.GET_APP_OPS_STATS,
-                Binder.getCallingPid(), Binder.getCallingUid(), null);
-        synchronized (this) {
-            Ops pkgOps = getOpsLocked(uid, packageName, false);
-            if (pkgOps == null) {
-                return false;
+        for (int op : PRIVACY_GUARD_OP_STATES) {
+            if (!isOpRestricted(uid, op, packageName)) {
+                return true;
             }
-            for (int j=0; j<PRIVACY_GUARD_OP_PERMS.length; j++) {
-                Op curOp = pkgOps.get(PRIVACY_GUARD_OP_PERMS[j]);
-                if (curOp != null && isControlAllowed(curOp.op, packageName)) {
-                    return true;
-                }
-            }
-            return false;
         }
+        return false;
     }
 
     @Override
@@ -1778,9 +1772,9 @@ public class AppOpsService extends IAppOpsService.Stub {
     @Override
     public void setPrivacyGuardSettingForPackage(int uid, String packageName, boolean state) {
         for (int op : PRIVACY_GUARD_OP_STATES) {
-            int switchOp = AppOpsManager.opToSwitch(op);
-            setMode(switchOp, uid, packageName, state
-                    ? AppOpsManager.MODE_ASK : AppOpsManager.MODE_ALLOWED);
+            setMode(op, uid, packageName,
+                    state ? AppOpsManager.MODE_ASK : AppOpsManager.MODE_ALLOWED,
+                    false);
         }
     }
 
