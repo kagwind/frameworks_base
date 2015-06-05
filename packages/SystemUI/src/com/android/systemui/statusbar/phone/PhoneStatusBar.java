@@ -1561,7 +1561,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
         if (recents != null) {
             recents.setOnClickListener(mRecentsClickListener);
-            recents.setOnTouchListener(mRecentsPreloadOnTouchListener);
+            //recents.setOnTouchListener(mRecentsPreloadOnTouchListener);
         }
         if (home != null) {
             home.setOnTouchListener(mHomeActionListener);
