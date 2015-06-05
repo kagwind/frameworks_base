@@ -45,7 +45,7 @@ interface IAppOpsService {
     boolean isControlAllowed(int code, String packageName);
 
     // Privacy guard methods
-    boolean hasPrivacyGuardOpsForPackage(String packageName);
+    boolean hasPrivacyGuardOpsForPackage(int uid, String packageName);
     boolean getPrivacyGuardSettingForPackage(int uid, String packageName);
     void setPrivacyGuardSettingForPackage(int uid, String packageName, boolean state);
 

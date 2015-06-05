@@ -1976,9 +1976,9 @@ public class AppOpsManager {
     }
 
     /** @hide */
-    public boolean hasPrivacyGuardOpsForPackage(String packageName) {
+    public boolean hasPrivacyGuardOpsForPackage(int uid, String packageName) {
         try {
-            return mService.hasPrivacyGuardOpsForPackage(packageName);
+            return mService.hasPrivacyGuardOpsForPackage(uid, packageName);
         } catch (RemoteException e) {
         }
         return false;
