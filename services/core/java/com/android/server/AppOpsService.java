@@ -93,7 +93,7 @@ public class AppOpsService extends IAppOpsService.Stub {
 
     private static final int[] PRIVACY_GUARD_OP_STATES = new int[] {
         AppOpsManager.OP_COARSE_LOCATION,
-        AppOpsManager.OP_VIBRATE,
+        //AppOpsManager.OP_VIBRATE,
         AppOpsManager.OP_READ_CONTACTS,
         AppOpsManager.OP_WRITE_CONTACTS,
         AppOpsManager.OP_READ_CALL_LOG,
@@ -103,15 +103,15 @@ public class AppOpsService extends IAppOpsService.Stub {
         AppOpsManager.OP_CALL_PHONE,
         AppOpsManager.OP_READ_SMS,
         AppOpsManager.OP_WRITE_SMS,
-        AppOpsManager.OP_RECEIVE_SMS,
+        //AppOpsManager.OP_RECEIVE_SMS,
         AppOpsManager.OP_SEND_SMS,
-        AppOpsManager.OP_WRITE_SETTINGS,
-        AppOpsManager.OP_SYSTEM_ALERT_WINDOW,
-        AppOpsManager.OP_ACCESS_NOTIFICATIONS,
+        //AppOpsManager.OP_WRITE_SETTINGS,
+        //AppOpsManager.OP_SYSTEM_ALERT_WINDOW,
+        //AppOpsManager.OP_ACCESS_NOTIFICATIONS,
         AppOpsManager.OP_CAMERA,
         AppOpsManager.OP_RECORD_AUDIO,
         AppOpsManager.OP_WAKE_LOCK,
-        AppOpsManager.OP_GET_USAGE_STATS,
+        //AppOpsManager.OP_GET_USAGE_STATS,
         AppOpsManager.OP_WIFI_CHANGE,
         AppOpsManager.OP_BLUETOOTH_CHANGE,
         AppOpsManager.OP_SEND_MMS,
@@ -129,7 +129,7 @@ public class AppOpsService extends IAppOpsService.Stub {
     private static final int[] PRIVACY_GUARD_OP_PERMS = new int[] {
         AppOpsManager.OP_COARSE_LOCATION,
         AppOpsManager.OP_FINE_LOCATION,
-        AppOpsManager.OP_VIBRATE,
+        //AppOpsManager.OP_VIBRATE,
         AppOpsManager.OP_READ_CONTACTS,
         AppOpsManager.OP_WRITE_CONTACTS,
         AppOpsManager.OP_READ_CALL_LOG,
@@ -140,20 +140,20 @@ public class AppOpsService extends IAppOpsService.Stub {
         AppOpsManager.OP_CALL_PHONE,
         AppOpsManager.OP_READ_SMS,
         AppOpsManager.OP_WRITE_SMS,
-        AppOpsManager.OP_RECEIVE_SMS,
-        AppOpsManager.OP_RECEIVE_EMERGECY_SMS,
-        AppOpsManager.OP_RECEIVE_MMS,
-        AppOpsManager.OP_RECEIVE_WAP_PUSH,
+        //AppOpsManager.OP_RECEIVE_SMS,
+        //AppOpsManager.OP_RECEIVE_EMERGECY_SMS,
+        //AppOpsManager.OP_RECEIVE_MMS,
+        //AppOpsManager.OP_RECEIVE_WAP_PUSH,
         AppOpsManager.OP_SEND_SMS,
         AppOpsManager.OP_READ_ICC_SMS,
         AppOpsManager.OP_WRITE_ICC_SMS,
-        AppOpsManager.OP_WRITE_SETTINGS,
-        AppOpsManager.OP_SYSTEM_ALERT_WINDOW,
-        AppOpsManager.OP_ACCESS_NOTIFICATIONS,
+        //AppOpsManager.OP_WRITE_SETTINGS,
+        //AppOpsManager.OP_SYSTEM_ALERT_WINDOW,
+        //AppOpsManager.OP_ACCESS_NOTIFICATIONS,
         AppOpsManager.OP_CAMERA,
         AppOpsManager.OP_RECORD_AUDIO,
         AppOpsManager.OP_WAKE_LOCK,
-        AppOpsManager.OP_GET_USAGE_STATS,
+        //AppOpsManager.OP_GET_USAGE_STATS,
         AppOpsManager.OP_WIFI_CHANGE,
         AppOpsManager.OP_BLUETOOTH_CHANGE,
         AppOpsManager.OP_SEND_MMS,
@@ -1747,11 +1747,19 @@ public class AppOpsService extends IAppOpsService.Stub {
 
     @Override
     public boolean hasPrivacyGuardOpsForPackage(int uid, String packageName) {
-        List<AppOpsManager.PackageOps> ops
-                = getOpsForPackage(uid, packageName, PRIVACY_GUARD_OP_PERMS);
-        if (ops != null && ops.size() > 0) {
-            return true;
-        } else {
+        mContext.enforcePermission(android.Manifest.permission.GET_APP_OPS_STATS,
+                Binder.getCallingPid(), Binder.getCallingUid(), null);
+        synchronized (this) {
+            Ops pkgOps = getOpsLocked(uid, packageName, false);
+            if (pkgOps == null) {
+                return false;
+            }
+            for (int j=0; j<PRIVACY_GUARD_OP_PERMS.length; j++) {
+                Op curOp = pkgOps.get(PRIVACY_GUARD_OP_PERMS[j]);
+                if (curOp != null && isControlAllowed(curOp.op, packageName)) {
+                    return true;
+                }
+            }
             return false;
         }
     }
