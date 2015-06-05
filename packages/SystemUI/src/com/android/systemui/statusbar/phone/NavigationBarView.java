@@ -870,8 +870,8 @@ public class NavigationBarView extends LinearLayout implements BaseStatusBar.Nav
 
         // force the low profile & disabled states into compliance
         mBarTransitions.init(mVertical);
-        setMenuVisibility(mShowMenu, true /* force */);
         setDisabledFlags(mDisabledFlags, true /* force */);
+        setMenuVisibility(mShowMenu, true /* force */);
 
         if (DEBUG) {
             Log.d(TAG, "reorient(): rot=" + mDisplay.getRotation());
