@@ -755,7 +755,7 @@ public class NavigationBarView extends LinearLayout implements BaseStatusBar.Nav
             getLeftImeArrowButton().setVisibility(View.GONE);
             getRightImeArrowButton().setVisibility(View.GONE);
         } else {
-            setMenuVisibility(mShowMenu, force);
+            setMenuVisibility(mShowMenu, true);
         }
 
         mBarTransitions.applyBackButtonQuiescentAlpha(mBarTransitions.getMode(), true /*animate*/);
