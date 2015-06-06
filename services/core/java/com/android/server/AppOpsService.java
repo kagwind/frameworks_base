@@ -40,6 +40,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.IPackageManager;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.media.AudioAttributes;
@@ -94,41 +95,40 @@ public class AppOpsService extends IAppOpsService.Stub {
         AppOpsManager.OP_COARSE_LOCATION,
         //AppOpsManager.OP_VIBRATE,
         AppOpsManager.OP_READ_CONTACTS,
-        AppOpsManager.OP_WRITE_CONTACTS,
+//        AppOpsManager.OP_WRITE_CONTACTS,
         AppOpsManager.OP_READ_CALL_LOG,
-        AppOpsManager.OP_WRITE_CALL_LOG,
+//        AppOpsManager.OP_WRITE_CALL_LOG,
         AppOpsManager.OP_READ_CALENDAR,
-        AppOpsManager.OP_WRITE_CALENDAR,
-        AppOpsManager.OP_CALL_PHONE,
+//        AppOpsManager.OP_WRITE_CALENDAR,
+//        AppOpsManager.OP_CALL_PHONE,
         AppOpsManager.OP_READ_SMS,
-        AppOpsManager.OP_WRITE_SMS,
+//        AppOpsManager.OP_WRITE_SMS,
         //AppOpsManager.OP_RECEIVE_SMS,
-        AppOpsManager.OP_SEND_SMS,
+//        AppOpsManager.OP_SEND_SMS,
         //AppOpsManager.OP_WRITE_SETTINGS,
         //AppOpsManager.OP_SYSTEM_ALERT_WINDOW,
         //AppOpsManager.OP_ACCESS_NOTIFICATIONS,
         AppOpsManager.OP_CAMERA,
         AppOpsManager.OP_RECORD_AUDIO,
-        AppOpsManager.OP_WAKE_LOCK,
+//        AppOpsManager.OP_WAKE_LOCK,
         //AppOpsManager.OP_GET_USAGE_STATS,
-        AppOpsManager.OP_WIFI_CHANGE,
-        AppOpsManager.OP_BLUETOOTH_CHANGE,
-        AppOpsManager.OP_SEND_MMS,
-        AppOpsManager.OP_READ_MMS,
-        AppOpsManager.OP_WRITE_MMS,
-        AppOpsManager.OP_BOOT_COMPLETED,
-        AppOpsManager.OP_NFC_CHANGE,
-        AppOpsManager.OP_DELETE_SMS,
-        AppOpsManager.OP_DELETE_MMS,
-        AppOpsManager.OP_DELETE_CONTACTS,
-        AppOpsManager.OP_DELETE_CALL_LOG,
-        AppOpsManager.OP_DATA_CONNECT_CHANGE
+//        AppOpsManager.OP_WIFI_CHANGE,
+//        AppOpsManager.OP_BLUETOOTH_CHANGE,
+//        AppOpsManager.OP_SEND_MMS,
+//        AppOpsManager.OP_READ_MMS,
+//        AppOpsManager.OP_WRITE_MMS,
+//        AppOpsManager.OP_BOOT_COMPLETED,
+//        AppOpsManager.OP_NFC_CHANGE,
+//        AppOpsManager.OP_DELETE_SMS,
+//        AppOpsManager.OP_DELETE_MMS,
+//        AppOpsManager.OP_DELETE_CONTACTS,
+//        AppOpsManager.OP_DELETE_CALL_LOG,
+//        AppOpsManager.OP_DATA_CONNECT_CHANGE
     };
 
     private static final int[] PRIVACY_GUARD_OP_PERMS = new int[] {
         AppOpsManager.OP_COARSE_LOCATION,
         AppOpsManager.OP_FINE_LOCATION,
-        //AppOpsManager.OP_VIBRATE,
         AppOpsManager.OP_READ_CONTACTS,
         AppOpsManager.OP_WRITE_CONTACTS,
         AppOpsManager.OP_READ_CALL_LOG,
@@ -139,20 +139,12 @@ public class AppOpsService extends IAppOpsService.Stub {
         AppOpsManager.OP_CALL_PHONE,
         AppOpsManager.OP_READ_SMS,
         AppOpsManager.OP_WRITE_SMS,
-        //AppOpsManager.OP_RECEIVE_SMS,
-        //AppOpsManager.OP_RECEIVE_EMERGECY_SMS,
-        //AppOpsManager.OP_RECEIVE_MMS,
-        //AppOpsManager.OP_RECEIVE_WAP_PUSH,
         AppOpsManager.OP_SEND_SMS,
         AppOpsManager.OP_READ_ICC_SMS,
         AppOpsManager.OP_WRITE_ICC_SMS,
-        //AppOpsManager.OP_WRITE_SETTINGS,
-        //AppOpsManager.OP_SYSTEM_ALERT_WINDOW,
-        //AppOpsManager.OP_ACCESS_NOTIFICATIONS,
         AppOpsManager.OP_CAMERA,
         AppOpsManager.OP_RECORD_AUDIO,
         AppOpsManager.OP_WAKE_LOCK,
-        //AppOpsManager.OP_GET_USAGE_STATS,
         AppOpsManager.OP_WIFI_CHANGE,
         AppOpsManager.OP_BLUETOOTH_CHANGE,
         AppOpsManager.OP_SEND_MMS,
@@ -1750,9 +1742,22 @@ public class AppOpsService extends IAppOpsService.Stub {
 
     @Override
     public boolean hasPrivacyGuardOpsForPackage(int uid, String packageName) {
-        for (int op : PRIVACY_GUARD_OP_STATES) {
-            if (!isOpRestricted(uid, op, packageName)) {
-                return true;
+        PackageInfo pkgInfo;
+        try {
+            pkgInfo = mContext.getPackageManager()
+                .getPackageInfo(packageName, PackageManager.GET_PERMISSIONS);
+        } catch (NameNotFoundException e) {
+            return false;
+        }
+
+        final String[] requestedPermissions = pkgInfo.requestedPermissions;
+        if (requestedPermissions != null) {
+            for (String requested : requestedPermissions) {
+                int curOp = AppOpsManager.getPrivacyGuardOp(requested);
+                if (curOp != AppOpsManager.OP_NONE
+                        && !isOpRestricted(uid, curOp, packageName)) {
+                    return true;
+                }
             }
         }
         return false;

@@ -119,7 +119,7 @@ public class AppOpsManager {
 
     // when adding one of these:
     //  - increment _NUM_OP
-    //  - add rows to sOpToSwitch, sOpToString, sOpNames, sOpPerms, sOpDefaultMode, sOpDefaultStrictMode,
+    //  - add rows to sOpToSwitch, sOpToString, sOpNames, sOpPerms, sPrivacyGuardOp, sOpDefaultMode, sOpDefaultStrictMode,
     //    sOpToOpString, sOpStrictMode.
     //  - add descriptive strings to frameworks/base/core/res/res/values/config.xml
     //  - add descriptive strings to Settings/res/values/arrays.xml
@@ -875,6 +875,75 @@ public class AppOpsManager {
     };
 
     /**
+     * Privacy Guard Ops and states need to
+     * match general Ops map. Unused Ops are flagged as OP_NONE
+     */
+    private static int[] sPrivacyGuardOp = new int[] {
+            OP_COARSE_LOCATION,
+            OP_COARSE_LOCATION,
+            OP_COARSE_LOCATION,
+            OP_NONE,
+            OP_READ_CONTACTS,
+            OP_WRITE_CONTACTS,
+            OP_READ_CALL_LOG,
+            OP_WRITE_CALL_LOG,
+            OP_READ_CALENDAR,
+            OP_WRITE_CALENDAR,
+            OP_COARSE_LOCATION,
+            OP_NONE,
+            OP_COARSE_LOCATION,
+            OP_NONE,
+            OP_READ_SMS,
+            OP_WRITE_SMS,
+            OP_NONE,
+            OP_NONE,
+            OP_NONE,
+            OP_NONE,
+            OP_SEND_SMS,
+            OP_READ_SMS,
+            OP_WRITE_SMS,
+            OP_NONE,
+            OP_NONE,
+            OP_NONE,
+            OP_CAMERA,
+            OP_RECORD_AUDIO,
+            OP_NONE,
+            OP_NONE,
+            OP_NONE,
+            OP_NONE,
+            OP_NONE,
+            OP_NONE,
+            OP_NONE,
+            OP_NONE,
+            OP_NONE,
+            OP_NONE,
+            OP_NONE,
+            OP_NONE,
+            OP_NONE,
+            OP_COARSE_LOCATION,
+            OP_COARSE_LOCATION,
+            OP_NONE,
+            OP_NONE,
+            OP_NONE,
+            OP_NONE,
+            OP_NONE,
+            OP_NONE,
+            OP_NONE,
+            OP_NONE,
+            OP_NONE,
+            OP_NONE,
+            OP_NONE,
+            OP_NONE,
+            OP_NONE,
+            OP_NONE,
+            OP_NONE,
+            OP_NONE,
+            OP_NONE,
+            OP_NONE,
+            OP_NONE
+    };
+
+    /**
      * This specifies the default mode for each operation.
      */
     private static int[] sOpDefaultMode = new int[] {
@@ -1275,6 +1344,19 @@ public class AppOpsManager {
      */
     public static boolean opAllowSystemBypassRestriction(int op) {
         return sOpAllowSystemRestrictionBypass[op];
+    }
+
+    /**
+     * Retrieve the permission associated privacy guard operation,
+     * or OP_NONE if there is not one.
+     */
+    public static int getPrivacyGuardOp(String permission) {
+        for (int i=0; i<sOpPerms.length; i++) {
+            if (sOpPerms[i] != null && sOpPerms[i].equals(permission)) {
+                return sPrivacyGuardOp[i];
+            }
+        }
+        return OP_NONE;
     }
 
     /**
