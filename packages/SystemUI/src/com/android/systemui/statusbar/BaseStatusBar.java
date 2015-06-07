@@ -1297,6 +1297,8 @@ public abstract class BaseStatusBar extends SystemUI implements
     protected void hideRecents(boolean triggeredFromAltTab, boolean triggeredFromHomeKey) {
         if (mRecents != null) {
             mRecents.hideRecents(triggeredFromAltTab, triggeredFromHomeKey);
+        } else if (mSlimRecents != null) {
+            mSlimRecents.closeRecents();
         }
     }
 
