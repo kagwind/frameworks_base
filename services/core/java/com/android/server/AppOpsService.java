@@ -515,10 +515,6 @@ public class AppOpsService extends IAppOpsService.Stub {
 
     @Override
     public void setMode(int code, int uid, String packageName, int mode) {
-        setMode(code, uid, packageName, mode, true);
-    }
-
-    public void setMode(int code, int uid, String packageName, int mode, boolean force) {
         if (Binder.getCallingPid() != Process.myPid()) {
             mContext.enforcePermission(android.Manifest.permission.UPDATE_APP_OPS_STATS,
                     Binder.getCallingPid(), Binder.getCallingUid(), null);
@@ -527,7 +523,7 @@ public class AppOpsService extends IAppOpsService.Stub {
         ArrayList<Callback> repCbs = null;
         code = AppOpsManager.opToSwitch(code);
         synchronized (this) {
-            Op op = getOpLocked(code, uid, packageName, force);
+            Op op = getOpLocked(code, uid, packageName, true);
             if (op != null) {
                 if (op.mode != mode) {
                     op.mode = mode;
@@ -1763,6 +1759,38 @@ public class AppOpsService extends IAppOpsService.Stub {
         return false;
     }
 
+    private List<Integer> getPrivacyGuardOpsForPackage(int uid, String packageName) {
+        PackageInfo pkgInfo;
+        List<Integer> ops = new ArrayList<Integer>();
+        try {
+            pkgInfo = mContext.getPackageManager()
+                .getPackageInfo(packageName, PackageManager.GET_PERMISSIONS);
+        } catch (NameNotFoundException e) {
+            return ops;
+        }
+
+        final String[] requestedPermissions = pkgInfo.requestedPermissions;
+        if (requestedPermissions != null) {
+            for (String requested : requestedPermissions) {
+                int curOp = AppOpsManager.getPrivacyGuardOp(requested);
+                if (curOp != AppOpsManager.OP_NONE
+                        && !isOpRestricted(uid, curOp, packageName)) {
+                    boolean duplicate = false;
+                    // check for duplicates
+                    for (int op : ops) {
+                        if (op == curOp) {
+                            duplicate = true;
+                        }
+                    }
+                    if (!duplicate) {
+                        ops.add(curOp);
+                    }
+                }
+            }
+        }
+        return ops;
+    }
+
     @Override
     public boolean getPrivacyGuardSettingForPackage(int uid, String packageName) {
         for (int op : PRIVACY_GUARD_OP_STATES) {
@@ -1776,10 +1804,10 @@ public class AppOpsService extends IAppOpsService.Stub {
 
     @Override
     public void setPrivacyGuardSettingForPackage(int uid, String packageName, boolean state) {
-        for (int op : PRIVACY_GUARD_OP_STATES) {
+        List<Integer> switchOps = getPrivacyGuardOpsForPackage(uid, packageName);
+        for (int op : switchOps) {
             setMode(op, uid, packageName,
-                    state ? AppOpsManager.MODE_ASK : AppOpsManager.MODE_ALLOWED,
-                    false);
+                    state ? AppOpsManager.MODE_ASK : AppOpsManager.MODE_ALLOWED);
         }
     }
 
