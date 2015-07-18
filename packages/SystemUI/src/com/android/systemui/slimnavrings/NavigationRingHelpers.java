@@ -34,6 +34,7 @@ import com.android.systemui.R;
 import java.net.URISyntaxException;
 
 import static com.android.internal.util.slim.ActionConstants.*;
+import com.android.internal.util.slim.ActionHelper;
 
 public class NavigationRingHelpers {
     public static final int MAX_ACTIONS = 3;
@@ -117,6 +118,9 @@ public class NavigationRingHelpers {
             resourceId = getTorchDrawableResId(context);
         } else if (action.equals(ACTION_ASSIST)) {
             resourceId = R.drawable.ic_navigation_ring_search;
+        } else if (action.startsWith("**")) {
+            // SlimActions without pre-defined navring icon, try to use navbar icon instead for now
+            return ActionHelper.getActionIconImage(context, action, null);
         }
 
         if (resourceId < 0) {
