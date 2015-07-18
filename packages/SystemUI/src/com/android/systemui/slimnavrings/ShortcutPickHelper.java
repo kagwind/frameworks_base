@@ -23,9 +23,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Vibrator;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -39,8 +41,11 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.android.internal.util.slim.ActionConstants.*;
+import com.android.internal.util.slim.DeviceUtils;
+import com.android.internal.util.slim.DeviceUtils.FilteredDeviceFeaturesArray;
 
 public class ShortcutPickHelper {
+    private static final String SETTINGS_METADATA_NAME = "com.android.settings";
     private final Context mContext;
     private final AppPickAdapter mAdapter;
     private final Intent mBaseIntent;
@@ -170,33 +175,39 @@ public class ShortcutPickHelper {
     private void createActionList() {
         mActions = new ActionHolder();
 
-        mActions.addAction(ACTION_APP, R.string.select_application);
-
-        if (NavigationRingHelpers.isAssistantAvailable(mContext)) {
-            mActions.addAction(ACTION_ASSIST, R.string.navring_action_google_now);
-        }
-        if (NavigationRingHelpers.isTorchAvailable(mContext)) {
-            mActions.addAction(ACTION_TORCH, R.string.navring_action_torch);
+        PackageManager pm = mContext.getPackageManager();
+        if (pm == null) {
+            mActions.addAction(ACTION_NULL, R.string.navring_action_none, 0);
+            return;
         }
 
-        mActions.addAction(ACTION_SCREENSHOT, R.string.navring_action_take_screenshot);
-        mActions.addAction(ACTION_IME, R.string.navring_action_open_ime_switcher);
-        mActions.addAction(ACTION_SILENT, R.string.navring_action_ring_silent);
-
-        Vibrator vibrator = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
-        if (vibrator != null && vibrator.hasVibrator()) {
-            mActions.addAction(ACTION_VIB, R.string.navring_action_ring_vibrate);
-            mActions.addAction(ACTION_VIB_SILENT,
-                    R.string.navring_action_ring_vibrate_silent);
+        Resources res = mContext.getResources();
+        try {
+            res = pm.getResourcesForApplication(SETTINGS_METADATA_NAME);
+        } catch (Exception e) {
+            Log.e("ShortcutHelper:", "can't access settings resources",e);
+            mActions.addAction(ACTION_NULL, R.string.navring_action_none, 0);
+            return;
         }
 
-        mActions.addAction(ACTION_KILL, R.string.navring_action_kill_app);
-        mActions.addAction(ACTION_POWER, R.string.navring_action_screen_off);
+        FilteredDeviceFeaturesArray mFinalActionDialogArray = new FilteredDeviceFeaturesArray();
+        mFinalActionDialogArray = DeviceUtils.filterUnsupportedDeviceFeatures(mContext,
+                res.getStringArray(res.getIdentifier(
+                        "shortcut_action_navring_values", "array", SETTINGS_METADATA_NAME)),
+                res.getStringArray(res.getIdentifier(
+                        "shortcut_action_navring_entries", "array", SETTINGS_METADATA_NAME)));
+
+        mActions.addAction(mFinalActionDialogArray);
     }
 
     private class ActionHolder {
-        private ArrayList<CharSequence> mAvailableEntries = new ArrayList<CharSequence>();
+        private ArrayList<String> mAvailableEntries = new ArrayList<String>();
         private ArrayList<String> mAvailableValues = new ArrayList<String>();
+
+        public void addAction(FilteredDeviceFeaturesArray filteredDeviceFeaturesArray) {
+            Collections.addAll(mAvailableEntries, filteredDeviceFeaturesArray.entries);
+            Collections.addAll(mAvailableValues, filteredDeviceFeaturesArray.values);
+        }
 
         public void addAction(String action, int entryResId, int index) {
             int itemIndex = getActionIndex(action);
@@ -239,8 +250,8 @@ public class ShortcutPickHelper {
             }
             return mAvailableValues.get(index);
         }
-        public CharSequence[] getEntries() {
-            return mAvailableEntries.toArray(new CharSequence[mAvailableEntries.size()]);
+        public String[] getEntries() {
+            return mAvailableEntries.toArray(new String[mAvailableEntries.size()]);
         }
     }
 }
