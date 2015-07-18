@@ -1264,6 +1264,9 @@ public final class Settings {
             for (String s : Secure.NAVIGATION_RING_TARGETS) {
                 MOVED_TO_SECURE.add(s);
             }
+            for (String s : Secure.NAVIGATION_RING_LONGPRESS_TARGETS) {
+                MOVED_TO_SECURE.add(s);
+            }
 
             /* CM12 CHANGES */
             MOVED_TO_SECURE.add(Secure.QS_TILES);
@@ -6338,6 +6341,16 @@ public final class Settings {
                 "navigation_ring_targets_0",
                 "navigation_ring_targets_1",
                 "navigation_ring_targets_2",
+        };
+
+        /**
+         * Custom navring longpress actions
+         * @hide
+         */
+        public static final String[] NAVIGATION_RING_LONGPRESS_TARGETS = new String[] {
+                "navigation_ring_longpress_targets_0",
+                "navigation_ring_longpress_targets_1",
+                "navigation_ring_longpress_targets_2",
         };
 
         /**
