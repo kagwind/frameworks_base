@@ -39,15 +39,9 @@ public class LiveDisplayTile extends QSTile<LiveDisplayTile.LiveDisplayState> {
 
     private boolean mListening;
 
-    private static final int MODE_OUTDOOR = 3;
-    private static final int MODE_DAY = 4;
-
-    private static final int OFF_TEMPERATURE = 6500;
-
-    private int mDayTemperature;
+    public static final int MODE_OUTDOOR = 3;
 
     private final boolean mOutdoorModeAvailable;
-    private final int mDefaultDayTemperature;
 
     public LiveDisplayTile(Host host) {
         super(host);
@@ -66,9 +60,6 @@ public class LiveDisplayTile extends QSTile<LiveDisplayTile.LiveDisplayState> {
         mOutdoorModeAvailable = Settings.System.getIntForUser(mContext.getContentResolver(),
                 Settings.System.DISPLAY_AUTO_OUTDOOR_MODE,
                 -1, UserHandle.USER_CURRENT) > -1;
-
-        mDefaultDayTemperature = mContext.getResources().getInteger(
-                com.android.internal.R.integer.config_dayColorTemperature);
 
         mObserver = new LiveDisplayObserver(mHandler);
         mObserver.startObserving();
@@ -118,27 +109,12 @@ public class LiveDisplayTile extends QSTile<LiveDisplayTile.LiveDisplayState> {
 
     private void changeToNextMode() {
         int next = getCurrentModeIndex() + 1;
-
+        if (!mOutdoorModeAvailable && next == MODE_OUTDOOR) {
+            next++;
+        }
         if (next >= mValues.length) {
             next = 0;
         }
-
-        while (true) {
-            // Skip outdoor mode if it's unsupported, and skip the day setting
-            // if it's the same as the off setting
-            if ((!mOutdoorModeAvailable &&
-                    Integer.valueOf(mValues[next]) == MODE_OUTDOOR) ||
-                    (mDayTemperature == OFF_TEMPERATURE &&
-                    Integer.valueOf(mValues[next]) == MODE_DAY)) {
-                next++;
-                if (next >= mValues.length) {
-                    next = 0;
-                }
-            } else {
-                break;
-            }
-        }
-
         Settings.System.putIntForUser(mContext.getContentResolver(),
                 Settings.System.DISPLAY_TEMPERATURE_MODE,
                 Integer.valueOf(mValues[next]), UserHandle.USER_CURRENT);
@@ -151,19 +127,12 @@ public class LiveDisplayTile extends QSTile<LiveDisplayTile.LiveDisplayState> {
 
         @Override
         public void onChange(boolean selfChange) {
-            mDayTemperature = Settings.System.getIntForUser(mContext.getContentResolver(),
-                    Settings.System.DISPLAY_TEMPERATURE_DAY,
-                    mDefaultDayTemperature,
-                    UserHandle.USER_CURRENT);
             refreshState(getCurrentModeIndex());
         }
 
         public void startObserving() {
             mContext.getContentResolver().registerContentObserver(
                     Settings.System.getUriFor(Settings.System.DISPLAY_TEMPERATURE_MODE),
-                    false, this);
-            mContext.getContentResolver().registerContentObserver(
-                    Settings.System.getUriFor(Settings.System.DISPLAY_TEMPERATURE_DAY),
                     false, this);
         }
 
