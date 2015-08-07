@@ -161,10 +161,10 @@ public class LiveDisplayTile extends QSTile<LiveDisplayTile.LiveDisplayState> {
         public void startObserving() {
             mContext.getContentResolver().registerContentObserver(
                     Settings.System.getUriFor(Settings.System.DISPLAY_TEMPERATURE_MODE),
-                    false, this, UserHandle.USER_ALL);
+                    false, this);
             mContext.getContentResolver().registerContentObserver(
                     Settings.System.getUriFor(Settings.System.DISPLAY_TEMPERATURE_DAY),
-                    false, this, UserHandle.USER_ALL);
+                    false, this);
         }
 
         public void endObserving() {
